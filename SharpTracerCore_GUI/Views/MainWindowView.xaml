@@ -1,0 +1,42 @@
+﻿<Window x:Class="SharpTracerCore.Views.MainWindowView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+        xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+        xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+        xmlns:productionViewModels="clr-namespace:SharpTracerCore.ViewModels.Production"
+        xmlns:designViewModels="clr-namespace:SharpTracerCore.ViewModels.Design"
+        xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="155" Width="500"
+        ResizeMode="NoResize"
+        DataContext="{dxmvvm:ViewModelSource Type=productionViewModels:MainWindowViewModel}"
+        d:DataContext="{dxmvvm:ViewModelSource Type=designViewModels:MainWindowViewModel}">
+    <Grid>
+        <dxlc:LayoutControl>
+            <dxlc:LayoutGroup Orientation="Vertical">
+                <dxlc:LayoutItem Label="Resolution" AddColonToLabel="True">
+                    <dxlc:LayoutGroup>
+                        <dxe:SpinEdit Value="{DXBinding 'XResolution', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsFloatValue="False" HorizontalAlignment="Left" MinWidth="65" NullText="X"></dxe:SpinEdit>
+                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left">x</TextBlock>
+                        <dxe:SpinEdit Value="{DXBinding 'YResolution', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsFloatValue="False" HorizontalAlignment="Left" MinWidth="65" NullText="Y"></dxe:SpinEdit>
+                    </dxlc:LayoutGroup>
+                </dxlc:LayoutItem>
+                <dxlc:LayoutItem Label="Save Location" AddColonToLabel="True">
+                    <dxe:ButtonEdit EditValue="{DXBinding 'SaveFilePath', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" NullText="Select a file location..."></dxe:ButtonEdit>
+                </dxlc:LayoutItem>
+                <dxlc:LayoutItem>
+                    <dx:SimpleButton Command="{Binding StartRenderCommand}">Go!</dx:SimpleButton>
+                </dxlc:LayoutItem>
+                <dxlc:LayoutItem>
+                    <dxlc:LayoutGroup HorizontalAlignment="Center">
+                        <TextBlock HorizontalAlignment="Left">Status:</TextBlock>
+                        <TextBlock Text="{DXBinding 'RenderStatus', Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left"/>
+                    </dxlc:LayoutGroup>
+                </dxlc:LayoutItem>
+            </dxlc:LayoutGroup>
+        </dxlc:LayoutControl>
+    </Grid>
+</Window>
