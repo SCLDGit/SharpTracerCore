@@ -13,3 +13,5 @@ Additionally, I build the basic framework of our application:
 - Create a simple CLI using Fluent Command Line Parser to get command line arguments for rendering (SharpTracerCore_CLI)
 - Create a RenderParameters class to store render settings rather than hard coding them into our Render() method (RenderHandler\RenderParameters.cs)
 - Add some nice quality-of-life additions, such as optional image watermarks and a render timer, and automatic opening of the rendered image upon completion
+
+We also completely forego the PPM image format and write directly to user-friendly image formats using the ImageSharp library
