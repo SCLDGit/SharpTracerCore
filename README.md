@@ -1,7 +1,7 @@
 # SharpTracerCore
 A ray tracer inspired by Peter Shirley's In One Weekend series
 
-#Chapter 1
+# Chapter 1
 Chapter one adds a very basic method of putting some colors into an image format so we:
 -Create a very, very basic Color class (RenderDataStructures\Color.cs)
 -Create a very simple loop to calculate colors based on image space (RenderHandler\Renderer.cs -> Render() method)
