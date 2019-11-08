@@ -15,20 +15,36 @@ namespace RenderHandler
 {
     public class Renderer
     {
+        public Color GetColor(ref Ray p_ray)
+        {
+            var unitDirection = Vec3.GetUnitVector(p_ray.Direction);
+
+            var t = 0.5d * (unitDirection.Y + 1.0d);
+
+            return (1.0d - t) * new Color(1.0, 1.0, 1.0) + t * new Color(0.5, 0.7, 1.0);
+        }
+
         public Task Render(RenderParameters p_renderParameters)
         {
             using var image = new Image<Rgba32>(p_renderParameters.XResolution, p_renderParameters.YResolution);
+
             var stopWatch = Stopwatch.StartNew();
+
+            var lowerLeftCorner = new Vec3(-2.0, -1.0, -1.0);
+            var horizontal = new Vec3(4.0, 0.0, 0.0);
+            var vertical = new Vec3(0.0, 2.0, 0.0);
+            var origin = new Vec3(0, 0, 0);
 
             for (var j = 0; j < p_renderParameters.YResolution; ++j)
             {
-                for (var i = 0; i < p_renderParameters.YResolution; ++i)
+                for (var i = 0; i < p_renderParameters.XResolution; ++i)
                 {
-                    var color = new Color(0, 0, 0);
+                    var u = i / (double)p_renderParameters.XResolution;
+                    var v = j / (double)p_renderParameters.YResolution;
+                    
+                    var ray = new Ray(origin, lowerLeftCorner + u * horizontal + v * vertical);
 
-                    color.SetR(i / (double)p_renderParameters.XResolution);
-                    color.SetG(j / (double)p_renderParameters.YResolution);
-                    color.SetB(0.2d);
+                    var color = GetColor(ref ray);
 
                     // Flip image writing here for Y axis. - Comment by Matt Heimlich on 11/8/2019 @ 19:24:07
                     image[i, p_renderParameters.YResolution - (j + 1)] =
