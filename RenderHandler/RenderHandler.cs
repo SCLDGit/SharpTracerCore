@@ -54,8 +54,6 @@ namespace RenderHandler
             {
                 var runtimeString = GetRuntimeString(stopWatch.ElapsedMilliseconds);
 
-                //var parallelString = RenderConstants.UseParallelProcessing ? "Parallel" : "Not Parallel";
-
                 using var imageWithRunData = image.Clone(p_ctx => p_ctx.ApplyScalingWaterMark(font, $@"{p_renderParameters.XResolution}x{p_renderParameters.YResolution} | {runtimeString}", Rgba32.GhostWhite, Rgba32.DarkSlateGray, 5, false, 30));
                 if (!Directory.Exists(Path.GetDirectoryName(p_renderParameters.SavePath)))
                 {
