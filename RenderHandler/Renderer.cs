@@ -10,13 +10,29 @@ using SixLabors.ImageSharp.Processing;
 using SixLabors.Fonts;
 
 using RenderDataStructures;
+using RenderDataStructures.Basics;
 
 namespace RenderHandler
 {
     public class Renderer
     {
+        public bool HitSphere(Vec3 p_center, double p_radius, ref Ray p_ray)
+        {
+            var objectCenter = p_ray.Origin - p_center;
+
+            var a = Vec3.GetDotProduct(p_ray.Direction, p_ray.Direction);
+            var b = 2.0d * Vec3.GetDotProduct(objectCenter, p_ray.Direction);
+            var c = Vec3.GetDotProduct(objectCenter, objectCenter) - p_radius * p_radius;
+
+            var discriminant = b * b - 4 * a * c;
+
+            return (discriminant > 0);
+        }
+
         public Color GetColor(ref Ray p_ray)
         {
+            if (HitSphere(new Vec3(0, 0, -1), 0.5d, ref p_ray)) return new Color(1, 0, 0);
+
             var unitDirection = Vec3.GetUnitVector(p_ray.Direction);
 
             var t = 0.5d * (unitDirection.Y + 1.0d);
