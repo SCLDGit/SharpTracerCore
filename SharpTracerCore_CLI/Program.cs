@@ -6,13 +6,6 @@ using RenderHandler;
 
 namespace SharpTracerCore_CLI
 {
-    public class ProgramArguments
-    {
-        public int XResolution { get; set; }
-        public int YResolution { get; set; }
-        public string SavePath { get; set; }
-    }
-
     class Program
     {
         static void Main(string[] args)
