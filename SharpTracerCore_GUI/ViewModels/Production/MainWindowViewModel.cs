@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
+using System.Threading.Tasks;
 using DevExpress.Mvvm.DataAnnotations;
 using DevExpress.Mvvm.POCO;
 
@@ -51,17 +52,21 @@ namespace SharpTracerCore.ViewModels.Production
 
         public virtual string RenderStatus { get; set; }
 
-        public void StartRender()
+        public async void StartRender()
         {
+            Renderer.TotalPixels = XResolution * YResolution;
+
+            Renderer.ProcessedPixels = 0;
+
             RenderStatus = "Rendering...";
 
             var renderParameters = new RenderParameters(XResolution, YResolution, SaveFilePath);
 
-            var renderTask = Renderer.Render(renderParameters);
+            var renderTime = new TimeSpan();
 
-            renderTask.Wait();
+            await Task.Factory.StartNew(() => Renderer.DoRender(renderParameters, out renderTime));
 
-            RenderStatus = "Done!";
+            RenderStatus = $"Done! Render Time: {renderTime.Hours:00}:{renderTime.Minutes:00}:{renderTime.Seconds:00}.{renderTime.Milliseconds / 10:000}";
         }
     }
 }

@@ -10,12 +10,12 @@
         xmlns:designViewModels="clr-namespace:SharpTracerCore.ViewModels.Design"
         xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
         mc:Ignorable="d"
-        Title="MainWindow" Height="155" Width="500"
-        ResizeMode="NoResize"
+        Title="MainWindow" Height="500" Width="500"
+        SizeToContent="WidthAndHeight"
         DataContext="{dxmvvm:ViewModelSource Type=productionViewModels:MainWindowViewModel}"
-        d:DataContext="{dxmvvm:ViewModelSource Type=designViewModels:MainWindowViewModel}">
+        d:DataContext="{dxmvvm:ViewModelSource Type=designViewModels:MainWindowViewModel}" HorizontalAlignment="Left" VerticalAlignment="Top">
     <Grid>
-        <dxlc:LayoutControl>
+        <dxlc:LayoutControl Orientation="Vertical">
             <dxlc:LayoutGroup Orientation="Vertical">
                 <dxlc:LayoutItem Label="Resolution" AddColonToLabel="True">
                     <dxlc:LayoutGroup>
@@ -27,8 +27,11 @@
                 <dxlc:LayoutItem Label="Save Location" AddColonToLabel="True">
                     <dxe:ButtonEdit EditValue="{DXBinding 'SaveFilePath', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" NullText="Select a file location..."></dxe:ButtonEdit>
                 </dxlc:LayoutItem>
-                <dxlc:LayoutItem>
+                <dxlc:LayoutItem Visibility="{DXBinding '!Renderer.IsRendering', Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={dx:BooleanToVisibilityConverter}}">
                     <dx:SimpleButton Command="{Binding StartRenderCommand}">Go!</dx:SimpleButton>
+                </dxlc:LayoutItem>
+                <dxlc:LayoutItem Visibility="{DXBinding 'Renderer.IsRendering', Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={dx:BooleanToVisibilityConverter}}">
+                    <dxe:ProgressBarEdit Minimum="0" Maximum="{DXBinding 'Renderer.TotalPixels', Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Value="{DXBinding 'Renderer.ProcessedPixels', Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                 </dxlc:LayoutItem>
                 <dxlc:LayoutItem>
                     <dxlc:LayoutGroup HorizontalAlignment="Center">

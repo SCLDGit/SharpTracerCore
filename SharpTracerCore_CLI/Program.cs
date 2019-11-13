@@ -18,11 +18,9 @@ namespace SharpTracerCore_CLI
 
             Console.WriteLine($@"Rendering {renderParameters.XResolution} x {renderParameters.YResolution} image to '{renderParameters.SavePath}'...");
 
-            var renderTask = renderer.Render(renderParameters);
+            renderer.DoRender(renderParameters, out var renderTime);
 
-            renderTask.Wait();
-
-            Console.WriteLine("Done!");
+            Console.WriteLine($"Done! Render took {renderTime.Hours:00}:{renderTime.Minutes:00}:{renderTime.Seconds:00}.{renderTime.Milliseconds / 10:000}");
         }
 
         private static ProgramArguments ParseArguments(string[] p_args)
@@ -30,10 +28,10 @@ namespace SharpTracerCore_CLI
             var parser = new FluentCommandLineParser<ProgramArguments>();
 
             parser.Setup(p_arg => p_arg.XResolution).As('x', "xRes")
-                .WithDescription("X resolution of rendered image.").SetDefault(256);
+                .WithDescription("X resolution of rendered image.").SetDefault(2000);
 
             parser.Setup(p_arg => p_arg.YResolution).As('y', "yRes")
-                .WithDescription("Y resolution of rendered image.").SetDefault(256);
+                .WithDescription("Y resolution of rendered image.").SetDefault(1000);
 
             parser.Setup(p_arg => p_arg.SavePath).As('p', "path")
                 .WithDescription("Full path of rendered image.").SetDefault(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),

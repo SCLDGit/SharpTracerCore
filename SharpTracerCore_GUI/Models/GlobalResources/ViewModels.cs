@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using SharpTracerCore.ViewModels;
-using SharpTracerCore.ViewModels.Production;
+﻿using SharpTracerCore.ViewModels.Production;
 
 namespace SharpTracerCore.Models.GlobalResources
 {
