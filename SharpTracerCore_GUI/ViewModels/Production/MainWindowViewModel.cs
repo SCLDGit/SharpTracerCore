@@ -30,8 +30,8 @@ namespace SharpTracerCore.ViewModels.Production
 
             Renderer = new Renderer();
 
-            XResolution = 256;
-            YResolution = 256;
+            XResolution = 200;
+            YResolution = 100;
 
             SaveFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
                 "SharpTracerCoreRenders", $"Render_{DateTime.Now:MMddyyyy_HHmmss}.png");
