@@ -16,7 +16,7 @@ namespace RenderHandler
 {
     public class Renderer
     {
-        public bool HitSphere(Vec3 p_center, double p_radius, ref Ray p_ray)
+        public double HitSphere(Vec3 p_center, double p_radius, ref Ray p_ray)
         {
             var objectCenter = p_ray.Origin - p_center;
 
@@ -26,16 +26,22 @@ namespace RenderHandler
 
             var discriminant = b * b - 4 * a * c;
 
-            return (discriminant > 0);
+            return discriminant < 0 ? -1.0 : (-b - Math.Sqrt(discriminant)) / (2.0 * a);
         }
 
         public Color GetColor(ref Ray p_ray)
         {
-            if (HitSphere(new Vec3(0, 0, -1), 0.5d, ref p_ray)) return new Color(1, 0, 0);
+            var t = HitSphere(new Vec3(0, 0, -1), 0.5d, ref p_ray);
+
+            if (t > 0.0d)
+            {
+                var n = Vec3.GetUnitVector(p_ray.PointAt(t) - new Vec3(0, 0, -1));
+                return 0.5 * new Color(n.X + 1, n.Y + 1, n.Z + 1);
+            }
 
             var unitDirection = Vec3.GetUnitVector(p_ray.Direction);
 
-            var t = 0.5d * (unitDirection.Y + 1.0d);
+            t = 0.5 * (unitDirection.Y + 1.0);
 
             return (1.0d - t) * new Color(1.0, 1.0, 1.0) + t * new Color(0.5, 0.7, 1.0);
         }
