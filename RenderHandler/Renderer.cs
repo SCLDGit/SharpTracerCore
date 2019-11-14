@@ -97,7 +97,8 @@ namespace RenderHandler
             world.AddTarget(new Sphere(new Vec3(0, 0, -1), 0.5, new Lambertian(new Color(0.8, 0.3, 0.3))));
             world.AddTarget(new Sphere(new Vec3(0, -100.5, -1), 100, new Lambertian(new Color(0.8, 0.8, 0.0))));
             world.AddTarget(new Sphere(new Vec3(1, 0, -1), 0.5, new Glossy(new Color(0.8, 0.6, 0.2), 1.0)));
-            world.AddTarget(new Sphere(new Vec3(-1, 0, -1), 0.5, new Glossy(new Color(0.8, 0.8, 0.8), 0.3)));
+            world.AddTarget(new Sphere(new Vec3(-1, 0, -1), 0.5, new Dielectric(new Color(1, 1, 1), 1.5)));
+            world.AddTarget(new Sphere(new Vec3(-1, 0, -1), -0.45, new Dielectric(new Color(1, 1, 1), 1.5)));
 
             var camera = new Camera();
 

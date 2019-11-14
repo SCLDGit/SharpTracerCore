@@ -8,7 +8,7 @@ namespace RenderDataStructures.Materials
 {
     public class Glossy : IMaterial
     {
-        public Glossy(Color p_albedo, double p_roughness = 0.2d)
+        public Glossy(Color p_albedo, double p_roughness = 0.0d)
         {
             Albedo = p_albedo;
 
