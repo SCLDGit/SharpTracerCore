@@ -73,6 +73,8 @@ namespace SharpTracerCore.ViewModels.Production
 
             var renderTime = new TimeSpan();
 
+            //Renderer.DoRender(renderParameters, out renderTime);
+
             await Task.Factory.StartNew(() => Renderer.DoRender(renderParameters, out renderTime));
 
             RenderStatus = $"Done! Render Time: {renderTime.Hours:00}:{renderTime.Minutes:00}:{renderTime.Seconds:00}.{renderTime.Milliseconds / 10:000}";
