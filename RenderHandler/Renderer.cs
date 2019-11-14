@@ -60,15 +60,23 @@ namespace RenderHandler
             }
         }
 
-        public Color GetColor(ref Ray p_ray, World p_world)
+        public Color GetColor(ref Ray p_ray, World p_world, int p_totalDepth)
         {
             var hitRecord = new HitRecord();
 
-            if (p_world.WasHit(p_ray, 0.0d, double.MaxValue, ref hitRecord))
+            if (p_world.WasHit(p_ray, 0.001d, double.MaxValue, ref hitRecord))
             {
-                var target = hitRecord.P + hitRecord.Normal + MathUtilities.GetRandomPointInUnitSphere();
-                var newRay = new Ray(hitRecord.P, target - hitRecord.P);
-                return 0.5 * GetColor(ref newRay, p_world);
+                var scatteredRay = new Ray(new Vec3(0, 0, 0), new Vec3(0, 0, 0));
+                var attenuation = new Color(0, 0, 0);
+
+                if (p_ray.Depth < p_totalDepth && hitRecord.Material.ScatterRay(ref p_ray, ref hitRecord, ref attenuation, ref scatteredRay))
+                {
+                    return attenuation * GetColor(ref scatteredRay, p_world, p_totalDepth);
+                }
+                else
+                {
+                    return new Color(0, 0, 0);
+                }
             }
 
             var unitDirection = Vec3.GetUnitVector(p_ray.Direction);
@@ -86,8 +94,10 @@ namespace RenderHandler
 
             var world = new World();
 
-            world.AddTarget(new Sphere(new Vec3(0, 0, -1), 0.5));
-            world.AddTarget(new Sphere(new Vec3(0, -100.5, -1), 100));
+            world.AddTarget(new Sphere(new Vec3(0, 0, -1), 0.5, new Lambertian(new Color(0.8, 0.3, 0.3))));
+            world.AddTarget(new Sphere(new Vec3(0, -100.5, -1), 100, new Lambertian(new Color(0.8, 0.8, 0.0))));
+            world.AddTarget(new Sphere(new Vec3(1, 0, -1), 0.5, new Glossy(new Color(0.8, 0.6, 0.2), 1.0)));
+            world.AddTarget(new Sphere(new Vec3(-1, 0, -1), 0.5, new Glossy(new Color(0.8, 0.8, 0.8), 0.3)));
 
             var camera = new Camera();
 
@@ -105,7 +115,7 @@ namespace RenderHandler
 
                         var ray = camera.GetRay(u, v);
 
-                        color += GetColor(ref ray, world);
+                        color += GetColor(ref ray, world, p_renderParameters.BounceDepth);
                     }
 
                     color /= p_renderParameters.NumberOfSamples;

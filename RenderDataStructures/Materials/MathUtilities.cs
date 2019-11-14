@@ -21,5 +21,10 @@ namespace RenderDataStructures.Materials
 
             return p;
         }
+
+        public static Vec3 ReflectRay(Vec3 p_vector, Vec3 p_normal)
+        {
+            return p_vector - 2 * Vec3.GetDotProduct(p_vector, p_normal) * p_normal;
+        }
     }
 }
