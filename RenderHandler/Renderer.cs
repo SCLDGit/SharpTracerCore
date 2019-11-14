@@ -17,6 +17,7 @@ using RenderDataStructures.Shapes;
 
 using JetBrains.Annotations;
 using RenderDataStructures.Cameras;
+using RenderDataStructures.Materials;
 
 namespace RenderHandler
 {
@@ -65,7 +66,9 @@ namespace RenderHandler
 
             if (p_world.WasHit(p_ray, 0.0d, double.MaxValue, ref hitRecord))
             {
-                return 0.5 * new Color(hitRecord.Normal.X + 1, hitRecord.Normal.Y + 1, hitRecord.Normal.Z + 1);
+                var target = hitRecord.P + hitRecord.Normal + MathUtilities.GetRandomPointInUnitSphere();
+                var newRay = new Ray(hitRecord.P, target - hitRecord.P);
+                return 0.5 * GetColor(ref newRay, p_world);
             }
 
             var unitDirection = Vec3.GetUnitVector(p_ray.Direction);
@@ -106,6 +109,8 @@ namespace RenderHandler
                     }
 
                     color /= p_renderParameters.NumberOfSamples;
+
+                    color.GammaCorrect(p_renderParameters.GammaCorrection);
 
                     // Flip image writing here for Y axis. - Comment by Matt Heimlich on 11/8/2019 @ 19:24:07
                     image[i, p_renderParameters.YResolution - (j + 1)] =

@@ -36,6 +36,8 @@ namespace SharpTracerCore.ViewModels.Production
 
             NumberOfSamples = 8;
 
+            GammaCorrection = 2;
+
             SaveFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
                 "SharpTracerCoreRenders", $"Render_{DateTime.Now:MMddyyyy_HHmmss}.png");
         }
@@ -51,6 +53,7 @@ namespace SharpTracerCore.ViewModels.Production
         public virtual int XResolution { get; set; }
         public virtual int YResolution { get; set; }
         public virtual int NumberOfSamples { get; set; }
+        public virtual int GammaCorrection { get; set; }
         public virtual string SaveFilePath { get; set; }
 
         public virtual string RenderStatus { get; set; }
@@ -63,7 +66,7 @@ namespace SharpTracerCore.ViewModels.Production
 
             RenderStatus = "Rendering...";
 
-            var renderParameters = new RenderParameters(XResolution, YResolution, NumberOfSamples, SaveFilePath);
+            var renderParameters = new RenderParameters(XResolution, YResolution, NumberOfSamples, GammaCorrection, SaveFilePath);
 
             var renderTime = new TimeSpan();
 

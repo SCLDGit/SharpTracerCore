@@ -27,6 +27,9 @@
                 <dxlc:LayoutItem Label="Number of Samples" AddColonToLabel="True">
                     <dxe:SpinEdit Value="{DXBinding 'NumberOfSamples', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsFloatValue="False" HorizontalAlignment="Left" MinWidth="65" NullText="X"></dxe:SpinEdit>
                 </dxlc:LayoutItem>
+                <dxlc:LayoutItem Label="Gamma Correction" AddColonToLabel="True">
+                    <dxe:SpinEdit Value="{DXBinding 'GammaCorrection', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsFloatValue="True" HorizontalAlignment="Left" MinWidth="65" NullText="X"></dxe:SpinEdit>
+                </dxlc:LayoutItem>
                 <dxlc:LayoutItem Label="Save Location" AddColonToLabel="True">
                     <dxe:ButtonEdit EditValue="{DXBinding 'SaveFilePath', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" NullText="Select a file location..."></dxe:ButtonEdit>
                 </dxlc:LayoutItem>
