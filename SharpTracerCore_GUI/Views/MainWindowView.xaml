@@ -10,7 +10,7 @@
         xmlns:designViewModels="clr-namespace:SharpTracerCore.ViewModels.Design"
         xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
         mc:Ignorable="d"
-        Title="MainWindow" Height="500" Width="500"
+        Title="SharpTracerCore" Height="500" Width="500"
         SizeToContent="WidthAndHeight"
         DataContext="{dxmvvm:ViewModelSource Type=productionViewModels:MainWindowViewModel}"
         d:DataContext="{dxmvvm:ViewModelSource Type=designViewModels:MainWindowViewModel}" HorizontalAlignment="Left" VerticalAlignment="Top">
@@ -23,6 +23,9 @@
                         <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left">x</TextBlock>
                         <dxe:SpinEdit Value="{DXBinding 'YResolution', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsFloatValue="False" HorizontalAlignment="Left" MinWidth="65" NullText="Y"></dxe:SpinEdit>
                     </dxlc:LayoutGroup>
+                </dxlc:LayoutItem>
+                <dxlc:LayoutItem Label="Number of Samples" AddColonToLabel="True">
+                    <dxe:SpinEdit Value="{DXBinding 'NumberOfSamples', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsFloatValue="False" HorizontalAlignment="Left" MinWidth="65" NullText="X"></dxe:SpinEdit>
                 </dxlc:LayoutItem>
                 <dxlc:LayoutItem Label="Save Location" AddColonToLabel="True">
                     <dxe:ButtonEdit EditValue="{DXBinding 'SaveFilePath', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" NullText="Select a file location..."></dxe:ButtonEdit>

@@ -14,7 +14,7 @@ namespace SharpTracerCore_CLI
 
             var parsedArguments =  ParseArguments(args);
 
-            var renderParameters = new RenderParameters(parsedArguments.XResolution, parsedArguments.YResolution, parsedArguments.SavePath);
+            var renderParameters = new RenderParameters(parsedArguments.XResolution, parsedArguments.YResolution, parsedArguments.NumberOfSamples, parsedArguments.SavePath);
 
             Console.WriteLine($@"Rendering {renderParameters.XResolution} x {renderParameters.YResolution} image to '{renderParameters.SavePath}'...");
 
@@ -32,6 +32,9 @@ namespace SharpTracerCore_CLI
 
             parser.Setup(p_arg => p_arg.YResolution).As('y', "yRes")
                 .WithDescription("Y resolution of rendered image.").SetDefault(1000);
+
+            parser.Setup(p_arg => p_arg.YResolution).As('s', "samples")
+                .WithDescription("Number of samples per pixel.").SetDefault(8);
 
             parser.Setup(p_arg => p_arg.SavePath).As('p', "path")
                 .WithDescription("Full path of rendered image.").SetDefault(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),

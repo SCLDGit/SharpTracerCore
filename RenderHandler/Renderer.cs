@@ -14,8 +14,9 @@ using SixLabors.Fonts;
 
 using RenderDataStructures.Basics;
 using RenderDataStructures.Shapes;
-using RenderHandler.Annotations;
+
 using JetBrains.Annotations;
+using RenderDataStructures.Cameras;
 
 namespace RenderHandler
 {
@@ -80,26 +81,31 @@ namespace RenderHandler
 
             var stopWatch = Stopwatch.StartNew();
 
-            var lowerLeftCorner = new Vec3(-2.0, -1.0, -1.0);
-            var horizontal = new Vec3(4.0, 0.0, 0.0);
-            var vertical = new Vec3(0.0, 2.0, 0.0);
-            var origin = new Vec3(0, 0, 0);
-
             var world = new World();
 
             world.AddTarget(new Sphere(new Vec3(0, 0, -1), 0.5));
             world.AddTarget(new Sphere(new Vec3(0, -100.5, -1), 100));
 
+            var camera = new Camera();
+
+            var rng = new Random();
+
             for (var j = 0; j < p_renderParameters.YResolution; ++j)
             {
                 for (var i = 0; i < p_renderParameters.XResolution; ++i)
                 {
-                    var u = i / (double)p_renderParameters.XResolution;
-                    var v = j / (double)p_renderParameters.YResolution;
-                    
-                    var ray = new Ray(origin, lowerLeftCorner + u * horizontal + v * vertical);
+                    var color = new Color(0, 0, 0);
+                    for (var s = 0; s < p_renderParameters.NumberOfSamples; ++s)
+                    {
+                        var u = (i + rng.NextDouble()) / p_renderParameters.XResolution;
+                        var v = (j + rng.NextDouble()) / p_renderParameters.YResolution;
 
-                    var color = GetColor(ref ray, world);
+                        var ray = camera.GetRay(u, v);
+
+                        color += GetColor(ref ray, world);
+                    }
+
+                    color /= p_renderParameters.NumberOfSamples;
 
                     // Flip image writing here for Y axis. - Comment by Matt Heimlich on 11/8/2019 @ 19:24:07
                     image[i, p_renderParameters.YResolution - (j + 1)] =
@@ -108,7 +114,6 @@ namespace RenderHandler
                 }
 
                 ProcessedPixels += p_renderParameters.XResolution;
-                OnPropertyChanged(nameof(Image));
             }
 
             stopWatch.Stop();
@@ -131,7 +136,7 @@ namespace RenderHandler
 
                 //var parallelString = RenderConstants.UseParallelProcessing ? "Parallel" : "Not Parallel";
 
-                using var imageWithRunData = image.Clone(p_ctx => p_ctx.ApplyScalingWaterMark(font, $@"{p_renderParameters.XResolution}x{p_renderParameters.YResolution} | {runtimeString}", Rgba32.GhostWhite, Rgba32.DarkSlateGray, 5, false, 30));
+                using var imageWithRunData = image.Clone(p_ctx => p_ctx.ApplyScalingWaterMark(font, $@"{p_renderParameters.XResolution}x{p_renderParameters.YResolution} | {p_renderParameters.NumberOfSamples}spp | {runtimeString}", Rgba32.GhostWhite, Rgba32.DarkSlateGray, 5, false, 30));
                 if (!Directory.Exists(Path.GetDirectoryName(p_renderParameters.SavePath)))
                 {
                     Directory.CreateDirectory(Path.GetDirectoryName(p_renderParameters.SavePath));
