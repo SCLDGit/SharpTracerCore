@@ -7,21 +7,30 @@ namespace RenderDataStructures.Cameras
 {
     public class Camera : ICamera
     {
-        public Camera()
+        public Camera(Vec3 p_lookFrom, Vec3 p_lookAt, Vec3 p_upVector, double p_verticalFieldOfView, double p_aspectRatio)
         {
-            LowerLeftCorner = new Vec3(-2, -1, -1);
-            Horizontal = new Vec3(4, 0, 0);
-            Vertical = new Vec3(0, 2, 0);
-            Origin = new Vec3(0, 0, 0);
+            Origin = p_lookFrom;
+
+            var theta = p_verticalFieldOfView * Math.PI / 180;
+            var halfHeight = Math.Tan(theta / 2);
+            var halfWidth = p_aspectRatio * halfHeight;
+
+            var w = Vec3.GetUnitVector(p_lookFrom - p_lookAt);
+            var u = Vec3.GetUnitVector(Vec3.GetCrossProduct(p_upVector, w));
+            var v = Vec3.GetCrossProduct(w, u);
+
+            LowerLeftCorner = Origin - halfWidth * u - halfHeight * v - w;
+            Horizontal = 2 * halfWidth * u;
+            Vertical = 2 * halfHeight * v;
         }
 
         public Vec3 Origin { get; set; }
         public Vec3 LowerLeftCorner { get; set; }
         public Vec3 Horizontal { get; set; }
         public Vec3 Vertical { get; set; }
-        public Ray GetRay(double p_u, double p_v)
+        public Ray GetRay(double p_s, double p_t)
         {
-            return new Ray(Origin, LowerLeftCorner + p_u * Horizontal + p_v * Vertical - Origin);
+            return new Ray(Origin, LowerLeftCorner + p_s * Horizontal + p_t * Vertical - Origin);
         }
     }
 }
