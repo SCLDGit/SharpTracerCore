@@ -2,39 +2,44 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-
+using System.Timers;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-using SixLabors.Fonts;
-
 using JetBrains.Annotations;
 
 using MathUtilities;
 using RenderDataStructures.Shapes;
 using RenderDataStructures.Cameras;
 using RenderDataStructures.Materials;
+using Color = MathUtilities.Color;
+using SystemFonts = SixLabors.Fonts.SystemFonts;
 
 namespace RenderHandler
 {
-    public class RenderChunk
-    {
-        public RenderChunk(int p_startRow, int p_endRow)
-        {
-            StartRow = p_startRow;
-            EndRow = p_endRow;
-        }
-
-        public int StartRow { get; set; }
-        public int EndRow { get; set; }
-    }
     public class Renderer : INotifyPropertyChanged
     {
+        public Bitmap ImageBuffer { get; set; }
+
+        //private Bitmap m_imageBuffer;
+
+        //public Bitmap ImageBuffer
+        //{
+        //    get => m_imageBuffer;
+        //    set
+        //    {
+        //        if (m_imageBuffer == value) return;
+        //        m_imageBuffer = value;
+        //        OnPropertyChanged(nameof(ImageBuffer));
+        //    }
+        //}
+
         private object Lock { get; set; } = new Object();
 
         private bool m_isRendering;
@@ -98,7 +103,20 @@ namespace RenderHandler
 
         public void DoRender(RenderParameters p_renderParameters, out TimeSpan p_renderTime)
         {
+            using var bufferRefreshTimer = new System.Timers.Timer { Interval = 250, AutoReset = true };
+
+            if (p_renderParameters.RealTimeUpdate)
+            {
+                // Hook up the Elapsed event for the timer. 
+                bufferRefreshTimer.Elapsed += BufferRefreshEvent;
+
+                // Start the timer
+                bufferRefreshTimer.Enabled = true;
+            }
+
             IsRendering = true;
+
+            ImageBuffer = new Bitmap(p_renderParameters.XResolution, p_renderParameters.YResolution);
 
             using var image = new Image<Rgba32>(p_renderParameters.XResolution, p_renderParameters.YResolution);
 
@@ -122,7 +140,7 @@ namespace RenderHandler
 
             var renderChunks = new List<RenderChunk>();
 
-            var availableThreads = Environment.ProcessorCount;
+            var availableThreads = Environment.ProcessorCount - 1;
 
             if (p_renderParameters.YResolution < availableThreads || !p_renderParameters.Parallel)
             {
@@ -152,7 +170,7 @@ namespace RenderHandler
 
             foreach (var renderChunk in renderChunks)
             {
-                var renderTask = Task.Factory.StartNew(() => RenderSomeChunk(image, camera, world, renderChunk.StartRow, renderChunk.EndRow, p_renderParameters));
+                var renderTask = Task.Factory.StartNew(() => RenderSomeChunk(image, ImageBuffer, camera, world, renderChunk.StartRow, renderChunk.EndRow, p_renderParameters));
                 renderTasks.Add(renderTask);
             }
 
@@ -198,10 +216,12 @@ namespace RenderHandler
 
             RandomPool.RandomPoolLUT.Clear();
 
+            OnPropertyChanged(nameof(ImageBuffer));
+
             IsRendering = false;
         }
 
-        private void RenderSomeChunk(Image<Rgba32> p_image, ICamera p_camera, World p_world, int p_renderChunkStartRow, int p_renderChunkEndRow, RenderParameters p_renderParameters)
+        private void RenderSomeChunk(Image<Rgba32> p_image, Bitmap p_imageBuffer, ICamera p_camera, World p_world, int p_renderChunkStartRow, int p_renderChunkEndRow, RenderParameters p_renderParameters)
         {
             var rng = new Random();
 
@@ -227,8 +247,24 @@ namespace RenderHandler
                     color.GammaCorrect(p_renderParameters.GammaCorrection);
 
                     // Flip image writing here for Y axis. - Comment by Matt Heimlich on 11/8/2019 @ 19:24:07
-                    p_image[i, p_renderParameters.YResolution - (j + 1)] = new Rgba32(new Vector3((float) color.R, (float) color.G, (float) color.B));
+                    lock (Lock)
+                    {
+                        var success = false;
+                        while (!success)
+                        {
+                            try
+                            {
+                                p_imageBuffer.SetPixel(i, p_renderParameters.YResolution - (j + 1), System.Drawing.Color.FromArgb(255, (int)(255 * color.R), (int)(255 * color.G), (int)(255 * color.B)));
+                                success = true;
+                            }
+                            catch (InvalidOperationException e)
+                            {
 
+                            }
+                        }
+                    }
+
+                    p_image[i, p_renderParameters.YResolution - (j + 1)] = new Rgba32(new Vector3((float) color.R, (float) color.G, (float) color.B));
                 }
 
                 lock (Lock)
@@ -236,6 +272,11 @@ namespace RenderHandler
                     ProcessedPixels += p_renderParameters.XResolution;
                 }
             }
+        }
+
+        private void BufferRefreshEvent(object p_sender, ElapsedEventArgs p_e)
+        {
+            OnPropertyChanged(nameof(ImageBuffer));
         }
 
         private static string GetRuntimeString(long p_stopWatchElapsedMilliseconds)

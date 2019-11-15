@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
 using DevExpress.Mvvm.DataAnnotations;
 using DevExpress.Mvvm.POCO;
 
@@ -37,6 +38,7 @@ namespace SharpTracerCore.ViewModels.Production
             NumberOfSamples = 8;
 
             Parallel = true;
+            RealTimeUpdate = true;
 
             BounceDepth = 12;
 
@@ -54,12 +56,15 @@ namespace SharpTracerCore.ViewModels.Production
 
         public virtual Renderer Renderer { get; set; }
 
+        public virtual BitmapImage ImageBuffer { get; set; }
+
         public virtual int XResolution { get; set; }
         public virtual int YResolution { get; set; }
         public virtual int NumberOfSamples { get; set; }
         public virtual int GammaCorrection { get; set; }
         public virtual int BounceDepth { get; set; }
         public virtual bool Parallel { get; set; }
+        public virtual bool RealTimeUpdate { get; set; }
         public virtual string SaveFilePath { get; set; }
 
         public virtual string RenderStatus { get; set; }
@@ -72,7 +77,7 @@ namespace SharpTracerCore.ViewModels.Production
 
             RenderStatus = "Rendering...";
 
-            var renderParameters = new RenderParameters(XResolution, YResolution, NumberOfSamples, BounceDepth, Parallel, GammaCorrection, SaveFilePath);
+            var renderParameters = new RenderParameters(XResolution, YResolution, NumberOfSamples, BounceDepth, Parallel, RealTimeUpdate, GammaCorrection, SaveFilePath);
 
             var renderTime = new TimeSpan();
 

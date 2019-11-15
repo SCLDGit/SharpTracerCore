@@ -14,7 +14,7 @@ namespace SharpTracerCore_CLI
 
             var parsedArguments =  ParseArguments(args);
 
-            var renderParameters = new RenderParameters(parsedArguments.XResolution, parsedArguments.YResolution, parsedArguments.NumberOfSamples, parsedArguments.BounceDepth, parsedArguments.Parallel, parsedArguments.GammaCorrection, parsedArguments.SavePath);
+            var renderParameters = new RenderParameters(parsedArguments.XResolution, parsedArguments.YResolution, parsedArguments.NumberOfSamples, parsedArguments.BounceDepth, parsedArguments.Parallel, false, parsedArguments.GammaCorrection, parsedArguments.SavePath);
 
             Console.WriteLine($@"Rendering {renderParameters.XResolution} x {renderParameters.YResolution} image to '{renderParameters.SavePath}'...");
 

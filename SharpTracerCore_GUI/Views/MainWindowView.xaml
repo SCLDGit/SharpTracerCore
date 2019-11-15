@@ -6,6 +6,7 @@
         xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
         xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
         xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+        xmlns:converters="clr-namespace:SharpTracerCore_GUI.ViewModels.Production.Converters"
         xmlns:productionViewModels="clr-namespace:SharpTracerCore.ViewModels.Production"
         xmlns:designViewModels="clr-namespace:SharpTracerCore.ViewModels.Design"
         xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
@@ -14,9 +15,13 @@
         SizeToContent="WidthAndHeight"
         DataContext="{dxmvvm:ViewModelSource Type=productionViewModels:MainWindowViewModel}"
         d:DataContext="{dxmvvm:ViewModelSource Type=designViewModels:MainWindowViewModel}" HorizontalAlignment="Left" VerticalAlignment="Top">
+    <Window.Resources>
+        <converters:ConvertBitmapToBitmapImage x:Key="convertBitmapToBitmapImage"/>
+    </Window.Resources>
     <Grid>
         <dxlc:LayoutControl Orientation="Vertical">
             <dxlc:LayoutGroup Orientation="Vertical">
+                <dxe:ImageEdit Visibility="{DXBinding 'RealTimeUpdate', Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={dx:BooleanToVisibilityConverter}}" Source="{DXBinding 'Renderer.ImageBuffer', Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource convertBitmapToBitmapImage}}" Width="{DXBinding 'XResolution', Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Height="{DXBinding 'YResolution', Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Focusable="False"></dxe:ImageEdit>
                 <dxlc:LayoutItem Label="Resolution" AddColonToLabel="True">
                     <dxlc:LayoutGroup>
                         <dxe:SpinEdit Value="{DXBinding 'XResolution', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsFloatValue="False" HorizontalAlignment="Left" MinWidth="65" NullText="X"></dxe:SpinEdit>
@@ -35,6 +40,9 @@
                 </dxlc:LayoutItem>
                 <dxlc:LayoutItem Label="Use Parallel Processing" AddColonToLabel="True">
                     <dxe:CheckEdit IsChecked="{DXBinding 'Parallel', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" MinWidth="65" NullText="X"></dxe:CheckEdit>
+                </dxlc:LayoutItem>
+                <dxlc:LayoutItem Label="Real Time Render View" AddColonToLabel="True">
+                    <dxe:CheckEdit IsChecked="{DXBinding 'RealTimeUpdate', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" MinWidth="65" NullText="X"></dxe:CheckEdit>
                 </dxlc:LayoutItem>
                 <dxlc:LayoutItem Label="Save Location" AddColonToLabel="True">
                     <dxe:ButtonEdit EditValue="{DXBinding 'SaveFilePath', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" NullText="Select a file location..."></dxe:ButtonEdit>
