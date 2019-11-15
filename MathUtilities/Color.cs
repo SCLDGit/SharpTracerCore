@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RenderDataStructures.Basics
+namespace MathUtilities
 {
     public class Color : Vec3
     {

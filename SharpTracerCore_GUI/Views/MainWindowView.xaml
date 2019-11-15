@@ -33,6 +33,9 @@
                 <dxlc:LayoutItem Label="Bounce Depth" AddColonToLabel="True">
                     <dxe:SpinEdit Value="{DXBinding 'BounceDepth', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsFloatValue="False" HorizontalAlignment="Left" MinWidth="65" NullText="X"></dxe:SpinEdit>
                 </dxlc:LayoutItem>
+                <dxlc:LayoutItem Label="Use Parallel Processing" AddColonToLabel="True">
+                    <dxe:CheckEdit IsChecked="{DXBinding 'Parallel', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" MinWidth="65" NullText="X"></dxe:CheckEdit>
+                </dxlc:LayoutItem>
                 <dxlc:LayoutItem Label="Save Location" AddColonToLabel="True">
                     <dxe:ButtonEdit EditValue="{DXBinding 'SaveFilePath', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" NullText="Select a file location..."></dxe:ButtonEdit>
                 </dxlc:LayoutItem>

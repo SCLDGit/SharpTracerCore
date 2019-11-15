@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RenderHandler", "RenderHand
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RenderDataStructures", "RenderDataStructures\RenderDataStructures.csproj", "{B330F50B-9BC6-42A6-9B4C-F89D021A8F37}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpTracerCore_CLI", "SharpTracerCore_CLI\SharpTracerCore_CLI.csproj", "{ED0250AA-4273-4EA1-929C-5020FE234878}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpTracerCore_CLI", "SharpTracerCore_CLI\SharpTracerCore_CLI.csproj", "{ED0250AA-4273-4EA1-929C-5020FE234878}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MathUtilities", "MathUtilities\MathUtilities.csproj", "{F20DA6BC-E633-49FB-BE53-440F7E10A681}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{ED0250AA-4273-4EA1-929C-5020FE234878}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ED0250AA-4273-4EA1-929C-5020FE234878}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ED0250AA-4273-4EA1-929C-5020FE234878}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F20DA6BC-E633-49FB-BE53-440F7E10A681}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F20DA6BC-E633-49FB-BE53-440F7E10A681}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F20DA6BC-E633-49FB-BE53-440F7E10A681}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F20DA6BC-E633-49FB-BE53-440F7E10A681}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,23 +1,35 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using RenderDataStructures.Basics;
+using System.Threading;
 
-namespace RenderDataStructures.Materials
+namespace MathUtilities
 {
-    public static class MathUtilities
+    public class Utilities
     {
-        public static Random SyncRandom { get; set; } = new Random();
-
         public static Vec3 GetRandomPointInUnitSphere()
         {
+            var rng = RandomPool.RandomPoolLUT[Thread.CurrentThread.ManagedThreadId];
+
             Vec3 p;
 
             do
             {
-                p = 2.0 * new Vec3(SyncRandom.NextDouble(), SyncRandom.NextDouble(),
-                        SyncRandom.NextDouble()) - new Vec3(1, 1, 1);
+                p = 2.0 * new Vec3(rng.NextDouble(), rng.NextDouble(),
+                        rng.NextDouble()) - new Vec3(1, 1, 1);
             } while (p.GetLengthSquared() >= 1.0);
+
+            return p;
+        }
+
+        public static Vec3 GetRandomPointInUnitDisk()
+        {
+            var rng = RandomPool.RandomPoolLUT[Thread.CurrentThread.ManagedThreadId];
+
+            Vec3 p;
+
+            do
+            {
+                p = 2.0 * new Vec3(rng.NextDouble(), rng.NextDouble(), 0) - new Vec3(1, 1, 0);
+            } while (Vec3.GetDotProduct(p, p) >= 1.0);
 
             return p;
         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -12,17 +13,30 @@ using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.Fonts;
 
-using RenderDataStructures.Basics;
-using RenderDataStructures.Shapes;
-
 using JetBrains.Annotations;
+
+using MathUtilities;
+using RenderDataStructures.Shapes;
 using RenderDataStructures.Cameras;
 using RenderDataStructures.Materials;
 
 namespace RenderHandler
 {
+    public class RenderChunk
+    {
+        public RenderChunk(int p_startRow, int p_endRow)
+        {
+            StartRow = p_startRow;
+            EndRow = p_endRow;
+        }
+
+        public int StartRow { get; set; }
+        public int EndRow { get; set; }
+    }
     public class Renderer : INotifyPropertyChanged
     {
+        private object Lock { get; set; } = new Object();
+
         private bool m_isRendering;
 
         public bool IsRendering
@@ -73,10 +87,8 @@ namespace RenderHandler
                 {
                     return attenuation * GetColor(ref scatteredRay, p_world, p_totalDepth);
                 }
-                else
-                {
-                    return new Color(0, 0, 0);
-                }
+
+                return new Color(0, 0, 0);
             }
 
             var unitDirection = Vec3.GetUnitVector(p_ray.Direction);
@@ -94,43 +106,57 @@ namespace RenderHandler
 
             var world = new World();
 
-            world.AddTarget(new Sphere(new Vec3(0, 0, -1), 0.5, new Lambertian(new Color(0.0, 0.0, 0.95))));
+            world.AddTarget(new Sphere(new Vec3(0, 0, -1), 0.5, new Lambertian(new Color(0.2, 0.1, 0.95))));
             world.AddTarget(new Sphere(new Vec3(0, -100.5, -1), 100, new Lambertian(new Color(0.8, 0.8, 0.0))));
-            world.AddTarget(new Sphere(new Vec3(1, 0, -1), 0.5, new Glossy(new Color(0.8, 0.6, 0.2), 1.0)));
+            world.AddTarget(new Sphere(new Vec3(1, 0, -1), 0.5, new Glossy(new Color(0.8, 0.8, 0.8), 0.025)));
             world.AddTarget(new Sphere(new Vec3(-1, 0, -1), 0.5, new Dielectric(new Color(1, 1, 1), 1.5)));
-            world.AddTarget(new Sphere(new Vec3(-1, 0, -1), -0.45, new Dielectric(new Color(1, 1, 1), 1.5)));
+            world.AddTarget(new Sphere(new Vec3(-1, 0, -1), -0.49, new Dielectric(new Color(1, 1, 1), 1.5)));
 
-            var camera = new Camera(new Vec3(-2, 2, 1), new Vec3(0, 0, -1), new Vec3(0, 1, 0), 90, (double)p_renderParameters.XResolution / p_renderParameters.YResolution);
+            var lookFrom = new Vec3(3, 3, 2);
+            var lookAt = new Vec3(0, 0, -1);
 
-            var rng = new Random();
+            var focalLength = (lookFrom - lookAt).GetLength();
+            var aperture = 0.01;
 
-            for (var j = 0; j < p_renderParameters.YResolution; ++j)
+            var camera = new ThinLensCamera(lookFrom, lookAt, new Vec3(0, 1, 0), 20, (double)p_renderParameters.XResolution / p_renderParameters.YResolution, aperture, focalLength);
+
+            var renderChunks = new List<RenderChunk>();
+
+            var availableThreads = Environment.ProcessorCount;
+
+            if (p_renderParameters.YResolution < availableThreads || !p_renderParameters.Parallel)
             {
-                for (var i = 0; i < p_renderParameters.XResolution; ++i)
-                {
-                    var color = new Color(0, 0, 0);
-                    for (var s = 0; s < p_renderParameters.NumberOfSamples; ++s)
-                    {
-                        var u = (i + rng.NextDouble()) / p_renderParameters.XResolution;
-                        var v = (j + rng.NextDouble()) / p_renderParameters.YResolution;
-
-                        var ray = camera.GetRay(u, v);
-
-                        color += GetColor(ref ray, world, p_renderParameters.BounceDepth);
-                    }
-
-                    color /= p_renderParameters.NumberOfSamples;
-
-                    color.GammaCorrect(p_renderParameters.GammaCorrection);
-
-                    // Flip image writing here for Y axis. - Comment by Matt Heimlich on 11/8/2019 @ 19:24:07
-                    image[i, p_renderParameters.YResolution - (j + 1)] =
-                        new Rgba32(new Vector3((float)color.R, (float)color.G, (float)color.B));
-
-                }
-
-                ProcessedPixels += p_renderParameters.XResolution;
+                var renderChunk = new RenderChunk(0, p_renderParameters.YResolution - 1);
+                renderChunks.Add(renderChunk);
             }
+            else
+            {
+                var chunkSize = p_renderParameters.YResolution / availableThreads;
+
+                for (var i = 0; i < availableThreads; ++i)
+                {
+                    if (i == availableThreads - 1)
+                    {
+                        var renderChunk = new RenderChunk(i * chunkSize, p_renderParameters.YResolution - 1);
+                        renderChunks.Add(renderChunk);
+                    }
+                    else
+                    {
+                        var renderChunk = new RenderChunk(i * chunkSize, i * chunkSize + chunkSize - 1);
+                        renderChunks.Add(renderChunk);
+                    }
+                }
+            }
+
+            var renderTasks = new List<Task>();
+
+            foreach (var renderChunk in renderChunks)
+            {
+                var renderTask = Task.Factory.StartNew(() => RenderSomeChunk(image, camera, world, renderChunk.StartRow, renderChunk.EndRow, p_renderParameters));
+                renderTasks.Add(renderTask);
+            }
+
+            Task.WaitAll(renderTasks.ToArray());
 
             stopWatch.Stop();
 
@@ -170,7 +196,46 @@ namespace RenderHandler
 
             p_renderTime = stopWatch.Elapsed;
 
+            RandomPool.RandomPoolLUT.Clear();
+
             IsRendering = false;
+        }
+
+        private void RenderSomeChunk(Image<Rgba32> p_image, ICamera p_camera, World p_world, int p_renderChunkStartRow, int p_renderChunkEndRow, RenderParameters p_renderParameters)
+        {
+            var rng = new Random();
+
+            RandomPool.RandomPoolLUT.TryAdd(Thread.CurrentThread.ManagedThreadId, rng);
+
+            for (var j = p_renderChunkStartRow; j <= p_renderChunkEndRow; ++j)
+            {
+                for (var i = 0; i < p_renderParameters.XResolution; ++i)
+                {
+                    var color = new Color(0, 0, 0);
+                    for (var s = 0; s < p_renderParameters.NumberOfSamples; ++s)
+                    {
+                        var u = (i + rng.NextDouble()) / p_renderParameters.XResolution;
+                        var v = (j + rng.NextDouble()) / p_renderParameters.YResolution;
+
+                        var ray = p_camera.GetRay(u, v);
+
+                        color += GetColor(ref ray, p_world, p_renderParameters.BounceDepth);
+                    }
+
+                    color /= p_renderParameters.NumberOfSamples;
+
+                    color.GammaCorrect(p_renderParameters.GammaCorrection);
+
+                    // Flip image writing here for Y axis. - Comment by Matt Heimlich on 11/8/2019 @ 19:24:07
+                    p_image[i, p_renderParameters.YResolution - (j + 1)] = new Rgba32(new Vector3((float) color.R, (float) color.G, (float) color.B));
+
+                }
+
+                lock (Lock)
+                {
+                    ProcessedPixels += p_renderParameters.XResolution;
+                }
+            }
         }
 
         private static string GetRuntimeString(long p_stopWatchElapsedMilliseconds)

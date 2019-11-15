@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using RenderDataStructures.Basics;
+using MathUtilities;
 
 namespace RenderDataStructures.Shapes
 {

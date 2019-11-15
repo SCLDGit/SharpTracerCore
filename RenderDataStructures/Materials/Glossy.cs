@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using RenderDataStructures.Basics;
+using System.Threading;
+using MathUtilities;
 using RenderDataStructures.Shapes;
 
 namespace RenderDataStructures.Materials
@@ -31,8 +32,8 @@ namespace RenderDataStructures.Materials
 
         public bool ScatterRay(ref Ray p_incomingRay, ref HitRecord p_hitRecord, ref Color p_attenuation, ref Ray p_scatteredRay)
         {
-            var reflected = MathUtilities.ReflectRay(Vec3.GetUnitVector(p_incomingRay.Direction), p_hitRecord.Normal);
-            p_scatteredRay = new Ray(p_hitRecord.P, reflected + Roughness * MathUtilities.GetRandomPointInUnitSphere(), p_incomingRay.Depth + 1);
+            var reflected = Utilities.ReflectRay(Vec3.GetUnitVector(p_incomingRay.Direction), p_hitRecord.Normal);
+            p_scatteredRay = new Ray(p_hitRecord.P, reflected + Roughness * Utilities.GetRandomPointInUnitSphere(), p_incomingRay.Depth + 1);
             p_attenuation = Albedo;
             return Vec3.GetDotProduct(p_scatteredRay.Direction, p_hitRecord.Normal) > 0;
         }

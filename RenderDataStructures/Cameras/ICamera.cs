@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using RenderDataStructures.Basics;
+using MathUtilities;
 
 namespace RenderDataStructures.Cameras
 {

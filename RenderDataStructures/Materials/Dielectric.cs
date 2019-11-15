@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using RenderDataStructures.Basics;
+using System.Threading;
+using MathUtilities;
 using RenderDataStructures.Shapes;
 
 namespace RenderDataStructures.Materials
@@ -33,8 +34,10 @@ namespace RenderDataStructures.Materials
 
         public bool ScatterRay(ref Ray p_incomingRay, ref HitRecord p_hitRecord, ref Color p_attenuation, ref Ray p_scatteredRay)
         {
+            var rng = RandomPool.RandomPoolLUT[Thread.CurrentThread.ManagedThreadId];
+
             Vec3 outwardNormal;
-            var reflected = MathUtilities.ReflectRay(p_incomingRay.Direction, p_hitRecord.Normal);
+            var reflected = Utilities.ReflectRay(p_incomingRay.Direction, p_hitRecord.Normal);
             var refracted = new Vec3(0);
             double niOverNt;
 
@@ -56,9 +59,9 @@ namespace RenderDataStructures.Materials
                 cosine = -Vec3.GetDotProduct(p_incomingRay.Direction, p_hitRecord.Normal) / p_incomingRay.Direction.GetLength();
             }
 
-            var reflectionProbability = MathUtilities.RefractRay(p_incomingRay.Direction, outwardNormal, niOverNt, ref refracted) ? MathUtilities.SchlickApproximation(cosine, IndexOfRefraction) : 1.0d;
+            var reflectionProbability = Utilities.RefractRay(p_incomingRay.Direction, outwardNormal, niOverNt, ref refracted) ? Utilities.SchlickApproximation(cosine, IndexOfRefraction) : 1.0d;
 
-            p_scatteredRay = MathUtilities.SyncRandom.NextDouble() < reflectionProbability ? new Ray(p_hitRecord.P, reflected + Roughness * MathUtilities.GetRandomPointInUnitSphere(), p_incomingRay.Depth + 1) : new Ray(p_hitRecord.P, refracted + Roughness * MathUtilities.GetRandomPointInUnitSphere(), p_incomingRay.Depth + 1);
+            p_scatteredRay = rng.NextDouble() < reflectionProbability ? new Ray(p_hitRecord.P, reflected + Roughness * Utilities.GetRandomPointInUnitSphere(), p_incomingRay.Depth + 1) : new Ray(p_hitRecord.P, refracted + Roughness * Utilities.GetRandomPointInUnitSphere(), p_incomingRay.Depth + 1);
 
             return true;
         }

@@ -1,4 +1,4 @@
-﻿namespace RenderDataStructures.Basics
+﻿namespace MathUtilities
 {
     public class Ray
     {

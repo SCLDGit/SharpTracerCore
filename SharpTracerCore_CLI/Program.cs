@@ -14,7 +14,7 @@ namespace SharpTracerCore_CLI
 
             var parsedArguments =  ParseArguments(args);
 
-            var renderParameters = new RenderParameters(parsedArguments.XResolution, parsedArguments.YResolution, parsedArguments.NumberOfSamples, parsedArguments.BounceDepth, parsedArguments.GammaCorrection, parsedArguments.SavePath);
+            var renderParameters = new RenderParameters(parsedArguments.XResolution, parsedArguments.YResolution, parsedArguments.NumberOfSamples, parsedArguments.BounceDepth, parsedArguments.Parallel, parsedArguments.GammaCorrection, parsedArguments.SavePath);
 
             Console.WriteLine($@"Rendering {renderParameters.XResolution} x {renderParameters.YResolution} image to '{renderParameters.SavePath}'...");
 
@@ -36,13 +36,16 @@ namespace SharpTracerCore_CLI
             parser.Setup(p_arg => p_arg.NumberOfSamples).As('s', "samples")
                 .WithDescription("Number of samples per pixel.").SetDefault(8);
 
+            parser.Setup(p_arg => p_arg.Parallel).As('p', "parallel")
+                .WithDescription("Use parallel processing.").SetDefault(true);
+
             parser.Setup(p_arg => p_arg.BounceDepth).As('b', "bounces")
                 .WithDescription("Number of light bounces before ending tracing.").SetDefault(8);
 
             parser.Setup(p_arg => p_arg.GammaCorrection).As('g', "gamma")
                 .WithDescription("Gamma correction value.").SetDefault(2);
 
-            parser.Setup(p_arg => p_arg.SavePath).As('p', "path")
+            parser.Setup(p_arg => p_arg.SavePath).As('o', "outputpath")
                 .WithDescription("Full path of rendered image.").SetDefault(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
                     "SharpTracerCoreRenders", $"Render_{DateTime.Now:MMddyyyy_HHmmss}.png"));
 

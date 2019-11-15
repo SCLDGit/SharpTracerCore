@@ -36,7 +36,9 @@ namespace SharpTracerCore.ViewModels.Production
 
             NumberOfSamples = 8;
 
-            BounceDepth = 8;
+            Parallel = true;
+
+            BounceDepth = 12;
 
             GammaCorrection = 2;
 
@@ -57,6 +59,7 @@ namespace SharpTracerCore.ViewModels.Production
         public virtual int NumberOfSamples { get; set; }
         public virtual int GammaCorrection { get; set; }
         public virtual int BounceDepth { get; set; }
+        public virtual bool Parallel { get; set; }
         public virtual string SaveFilePath { get; set; }
 
         public virtual string RenderStatus { get; set; }
@@ -69,7 +72,7 @@ namespace SharpTracerCore.ViewModels.Production
 
             RenderStatus = "Rendering...";
 
-            var renderParameters = new RenderParameters(XResolution, YResolution, NumberOfSamples, BounceDepth, GammaCorrection, SaveFilePath);
+            var renderParameters = new RenderParameters(XResolution, YResolution, NumberOfSamples, BounceDepth, Parallel, GammaCorrection, SaveFilePath);
 
             var renderTime = new TimeSpan();
 

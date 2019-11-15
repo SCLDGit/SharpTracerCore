@@ -1,4 +1,4 @@
-﻿using RenderDataStructures.Basics;
+﻿using MathUtilities;
 
 namespace RenderDataStructures.Shapes
 {
