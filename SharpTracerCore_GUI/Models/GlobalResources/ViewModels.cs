@@ -1,6 +1,6 @@
 ﻿using SharpTracerCore.ViewModels.Production;
 
-namespace SharpTracerCore.Models.GlobalResources
+namespace SharpTracerCore_GUI.Models.GlobalResources
 {
     public static class ViewModels
     {

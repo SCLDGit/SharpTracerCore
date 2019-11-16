@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using DevExpress.Mvvm.DataAnnotations;
 using DevExpress.Mvvm.POCO;
@@ -26,14 +27,14 @@ namespace SharpTracerCore.ViewModels.Production
 
         protected MainWindowViewModel()
         {
-            Models.GlobalResources.ViewModels.MainWindowViewModel = this;
+            SharpTracerCore_GUI.Models.GlobalResources.ViewModels.MainWindowViewModel = this;
 
             RenderStatus = "Waiting...";
 
             Renderer = new Renderer();
 
-            XResolution = 200;
-            YResolution = 100;
+            XResolution = 1280;
+            YResolution = 720;
 
             NumberOfSamples = 8;
 
@@ -56,7 +57,7 @@ namespace SharpTracerCore.ViewModels.Production
 
         public virtual Renderer Renderer { get; set; }
 
-        public virtual BitmapImage ImageBuffer { get; set; }
+        public virtual WriteableBitmap WriteableImageBuffer { get; set; }
 
         public virtual int XResolution { get; set; }
         public virtual int YResolution { get; set; }
@@ -71,6 +72,8 @@ namespace SharpTracerCore.ViewModels.Production
 
         public async void StartRender()
         {
+            WriteableImageBuffer = new WriteableBitmap(XResolution, YResolution, 96, 96, PixelFormats.Pbgra32, null);
+
             Renderer.TotalPixels = XResolution * YResolution;
 
             Renderer.ProcessedPixels = 0;

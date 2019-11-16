@@ -13,15 +13,17 @@
         mc:Ignorable="d"
         Title="SharpTracerCore" Height="500" Width="500"
         SizeToContent="WidthAndHeight"
+        WindowStartupLocation="CenterScreen"
         DataContext="{dxmvvm:ViewModelSource Type=productionViewModels:MainWindowViewModel}"
         d:DataContext="{dxmvvm:ViewModelSource Type=designViewModels:MainWindowViewModel}" HorizontalAlignment="Left" VerticalAlignment="Top">
     <Window.Resources>
         <converters:ConvertBitmapToBitmapImage x:Key="convertBitmapToBitmapImage"/>
+        <converters:ConvertBitmapToWriteableBitmap x:Key="convertBitmapToWriteableBitmap"/>
     </Window.Resources>
     <Grid>
         <dxlc:LayoutControl Orientation="Vertical">
             <dxlc:LayoutGroup Orientation="Vertical">
-                <dxe:ImageEdit Visibility="{DXBinding 'RealTimeUpdate', Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={dx:BooleanToVisibilityConverter}}" Source="{DXBinding 'Renderer.ImageBuffer', Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource convertBitmapToBitmapImage}}" Width="{DXBinding 'XResolution', Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Height="{DXBinding 'YResolution', Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Focusable="False"></dxe:ImageEdit>
+                <dxe:ImageEdit Visibility="{DXBinding 'RealTimeUpdate', Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={dx:BooleanToVisibilityConverter}}" Source="{DXBinding 'Renderer.ImageBuffer', Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource convertBitmapToWriteableBitmap}}" Width="{DXBinding 'XResolution', Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Height="{DXBinding 'YResolution', Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Focusable="False"></dxe:ImageEdit>
                 <dxlc:LayoutItem Label="Resolution" AddColonToLabel="True">
                     <dxlc:LayoutGroup>
                         <dxe:SpinEdit Value="{DXBinding 'XResolution', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsFloatValue="False" HorizontalAlignment="Left" MinWidth="65" NullText="X"></dxe:SpinEdit>

@@ -23,24 +23,38 @@ using SystemFonts = SixLabors.Fonts.SystemFonts;
 
 namespace RenderHandler
 {
+    public static class ImageLock
+    {
+        public static object Lock { get; set; } = new object();
+    }
+
+    public class ThreadSafeImage
+    {
+        private Bitmap m_image;
+
+        public Bitmap Image
+        {
+            get
+            {
+                lock (ImageLock.Lock)
+                {
+                    return m_image;
+                }
+            }
+            set
+            {
+                lock (ImageLock.Lock)
+                {
+                    if (m_image == value) return;
+                    m_image = value;
+                }
+            }
+        }
+        public bool IsLocked { get; set; }
+    }
     public class Renderer : INotifyPropertyChanged
     {
-        public Bitmap ImageBuffer { get; set; }
-
-        //private Bitmap m_imageBuffer;
-
-        //public Bitmap ImageBuffer
-        //{
-        //    get => m_imageBuffer;
-        //    set
-        //    {
-        //        if (m_imageBuffer == value) return;
-        //        m_imageBuffer = value;
-        //        OnPropertyChanged(nameof(ImageBuffer));
-        //    }
-        //}
-
-        private object Lock { get; set; } = new Object();
+        public ThreadSafeImage ImageBuffer { get; set; }
 
         private bool m_isRendering;
 
@@ -116,7 +130,11 @@ namespace RenderHandler
 
             IsRendering = true;
 
-            ImageBuffer = new Bitmap(p_renderParameters.XResolution, p_renderParameters.YResolution);
+            ImageBuffer = new ThreadSafeImage()
+            {
+                Image = new Bitmap(p_renderParameters.XResolution, p_renderParameters.YResolution),
+                IsLocked = false
+            };
 
             using var image = new Image<Rgba32>(p_renderParameters.XResolution, p_renderParameters.YResolution);
 
@@ -140,7 +158,7 @@ namespace RenderHandler
 
             var renderChunks = new List<RenderChunk>();
 
-            var availableThreads = Environment.ProcessorCount - 1;
+            var availableThreads = Environment.ProcessorCount;
 
             if (p_renderParameters.YResolution < availableThreads || !p_renderParameters.Parallel)
             {
@@ -170,7 +188,7 @@ namespace RenderHandler
 
             foreach (var renderChunk in renderChunks)
             {
-                var renderTask = Task.Factory.StartNew(() => RenderSomeChunk(image, ImageBuffer, camera, world, renderChunk.StartRow, renderChunk.EndRow, p_renderParameters));
+                var renderTask = Task.Factory.StartNew(() => RenderSomeChunk(image, camera, world, renderChunk.StartRow, renderChunk.EndRow, p_renderParameters));
                 renderTasks.Add(renderTask);
             }
 
@@ -210,7 +228,7 @@ namespace RenderHandler
             }
 
             // Open rendered image automatically.
-            new Process { StartInfo = new ProcessStartInfo(p_renderParameters.SavePath) { UseShellExecute = true } }.Start();
+            // new Process { StartInfo = new ProcessStartInfo(p_renderParameters.SavePath) { UseShellExecute = true } }.Start();
 
             p_renderTime = stopWatch.Elapsed;
 
@@ -221,7 +239,7 @@ namespace RenderHandler
             IsRendering = false;
         }
 
-        private void RenderSomeChunk(Image<Rgba32> p_image, Bitmap p_imageBuffer, ICamera p_camera, World p_world, int p_renderChunkStartRow, int p_renderChunkEndRow, RenderParameters p_renderParameters)
+        private void RenderSomeChunk(Image<Rgba32> p_image, ICamera p_camera, World p_world, int p_renderChunkStartRow, int p_renderChunkEndRow, RenderParameters p_renderParameters)
         {
             var rng = new Random();
 
@@ -247,29 +265,25 @@ namespace RenderHandler
                     color.GammaCorrect(p_renderParameters.GammaCorrection);
 
                     // Flip image writing here for Y axis. - Comment by Matt Heimlich on 11/8/2019 @ 19:24:07
-                    lock (Lock)
+                    if (p_renderParameters.RealTimeUpdate)
                     {
-                        var success = false;
-                        while (!success)
+                        lock (ImageLock.Lock)
                         {
-                            try
-                            {
-                                p_imageBuffer.SetPixel(i, p_renderParameters.YResolution - (j + 1), System.Drawing.Color.FromArgb(255, (int)(255 * color.R), (int)(255 * color.G), (int)(255 * color.B)));
-                                success = true;
-                            }
-                            catch (InvalidOperationException e)
-                            {
-
-                            }
+                            ImageBuffer.Image.SetPixel(i, p_renderParameters.YResolution - (j + 1), System.Drawing.Color.FromArgb(255, (int)(255 * color.R), (int)(255 * color.G), (int)(255 * color.B)));
                         }
                     }
 
                     p_image[i, p_renderParameters.YResolution - (j + 1)] = new Rgba32(new Vector3((float) color.R, (float) color.G, (float) color.B));
                 }
 
-                lock (Lock)
+                lock (ImageLock.Lock)
                 {
                     ProcessedPixels += p_renderParameters.XResolution;
+
+                    //if (p_renderParameters.RealTimeUpdate)
+                    //{
+                    //    OnPropertyChanged(nameof(ImageBuffer));
+                    //}
                 }
             }
         }
