@@ -23,12 +23,12 @@
     <Grid>
         <dxlc:LayoutControl Orientation="Vertical">
             <dxlc:LayoutGroup Orientation="Vertical">
-                <dxe:ImageEdit Visibility="{DXBinding 'RealTimeUpdate', Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={dx:BooleanToVisibilityConverter}}" Source="{DXBinding 'Renderer.ImageBuffer', Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource convertBitmapToWriteableBitmap}}" Width="{DXBinding 'XResolution', Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Height="{DXBinding 'YResolution', Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Focusable="False"></dxe:ImageEdit>
+                <dxe:ImageEdit MaxHeight="720" MaxWidth="1280" Visibility="{DXBinding 'RealTimeUpdate', Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={dx:BooleanToVisibilityConverter}}" Source="{DXBinding 'Renderer.ImageBuffer', Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource convertBitmapToWriteableBitmap}}" Width="{DXBinding 'XResolution', Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Height="{DXBinding 'YResolution', Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Focusable="False"></dxe:ImageEdit>
                 <dxlc:LayoutItem Label="Resolution" AddColonToLabel="True">
                     <dxlc:LayoutGroup>
-                        <dxe:SpinEdit Value="{DXBinding 'XResolution', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsFloatValue="False" HorizontalAlignment="Left" MinWidth="65" NullText="X"></dxe:SpinEdit>
+                        <dxe:SpinEdit Value="{DXBinding 'XResolution', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsFloatValue="False" HorizontalAlignment="Left" MinWidth="65" NullText="X" MaskType="Simple" Mask="d"></dxe:SpinEdit>
                         <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left">x</TextBlock>
-                        <dxe:SpinEdit Value="{DXBinding 'YResolution', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsFloatValue="False" HorizontalAlignment="Left" MinWidth="65" NullText="Y"></dxe:SpinEdit>
+                        <dxe:SpinEdit Value="{DXBinding 'YResolution', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsFloatValue="False" HorizontalAlignment="Left" MinWidth="65" NullText="Y" Mask="d"></dxe:SpinEdit>
                     </dxlc:LayoutGroup>
                 </dxlc:LayoutItem>
                 <dxlc:LayoutItem Label="Number of Samples" AddColonToLabel="True">

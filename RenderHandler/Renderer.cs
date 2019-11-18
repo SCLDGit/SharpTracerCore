@@ -140,21 +140,11 @@ namespace RenderHandler
 
             var stopWatch = Stopwatch.StartNew();
 
-            var world = new World();
+            var newScene = SceneGenerator.GenerateRandomScene(p_renderParameters, 500);
 
-            world.AddTarget(new Sphere(new Vec3(0, 0, -1), 0.5, new Lambertian(new Color(0.2, 0.1, 0.95))));
-            world.AddTarget(new Sphere(new Vec3(0, -100.5, -1), 100, new Lambertian(new Color(0.8, 0.8, 0.0))));
-            world.AddTarget(new Sphere(new Vec3(1, 0, -1), 0.5, new Glossy(new Color(0.8, 0.8, 0.8), 0.025)));
-            world.AddTarget(new Sphere(new Vec3(-1, 0, -1), 0.5, new Dielectric(new Color(1, 1, 1), 1.5)));
-            world.AddTarget(new Sphere(new Vec3(-1, 0, -1), -0.49, new Dielectric(new Color(1, 1, 1), 1.5)));
+            var world = new World(newScene.World);
 
-            var lookFrom = new Vec3(3, 3, 2);
-            var lookAt = new Vec3(0, 0, -1);
-
-            var focalLength = (lookFrom - lookAt).GetLength();
-            var aperture = 0.01;
-
-            var camera = new ThinLensCamera(lookFrom, lookAt, new Vec3(0, 1, 0), 20, (double)p_renderParameters.XResolution / p_renderParameters.YResolution, aperture, focalLength);
+            var camera = newScene.Camera;
 
             var renderChunks = new List<RenderChunk>();
 
@@ -242,6 +232,8 @@ namespace RenderHandler
         private void RenderSomeChunk(Image<Rgba32> p_image, ICamera p_camera, World p_world, int p_renderChunkStartRow, int p_renderChunkEndRow, RenderParameters p_renderParameters)
         {
             var rng = new Random();
+
+            Thread.CurrentThread.Priority = ThreadPriority.Highest;
 
             RandomPool.RandomPoolLUT.TryAdd(Thread.CurrentThread.ManagedThreadId, rng);
 
