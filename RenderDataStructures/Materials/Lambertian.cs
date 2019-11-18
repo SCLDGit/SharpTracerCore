@@ -18,7 +18,7 @@ namespace RenderDataStructures.Materials
         public bool ScatterRay(ref Ray p_incomingRay, ref HitRecord p_hitRecord, ref Color p_attenuation, ref Ray p_scatteredRay)
         {
             var target = p_hitRecord.P + p_hitRecord.Normal + Utilities.GetRandomPointInUnitSphere();
-            p_scatteredRay = new Ray(p_hitRecord.P, target - p_hitRecord.P, p_incomingRay.Depth + 1);
+            p_scatteredRay = new Ray(p_hitRecord.P, target - p_hitRecord.P, p_incomingRay.Time, p_incomingRay.Depth + 1);
             p_attenuation = Albedo;
 
             return true;

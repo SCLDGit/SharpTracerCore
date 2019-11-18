@@ -95,6 +95,8 @@ namespace RenderHandler
 
         public Color GetColor(ref Ray p_ray, World p_world, int p_totalDepth)
         {
+            var rng = RandomPool.RandomPoolLUT[Thread.CurrentThread.ManagedThreadId];
+
             var hitRecord = new HitRecord();
 
             if (p_world.WasHit(p_ray, 0.001d, double.MaxValue, ref hitRecord))
@@ -140,11 +142,7 @@ namespace RenderHandler
 
             var stopWatch = Stopwatch.StartNew();
 
-            var newScene = SceneGenerator.GenerateRandomScene(p_renderParameters, 500);
-
-            var world = new World(newScene.World);
-
-            var camera = newScene.Camera;
+            var newScene = SceneGenerator.GenerateSingleMovingSphereTestScene(p_renderParameters);
 
             var renderChunks = new List<RenderChunk>();
 
@@ -178,7 +176,7 @@ namespace RenderHandler
 
             foreach (var renderChunk in renderChunks)
             {
-                var renderTask = Task.Factory.StartNew(() => RenderSomeChunk(image, camera, world, renderChunk.StartRow, renderChunk.EndRow, p_renderParameters));
+                var renderTask = Task.Factory.StartNew(() => RenderSomeChunk(image, newScene.Camera, newScene.World, renderChunk.StartRow, renderChunk.EndRow, p_renderParameters));
                 renderTasks.Add(renderTask);
             }
 

@@ -33,7 +33,7 @@ namespace RenderDataStructures.Materials
         public bool ScatterRay(ref Ray p_incomingRay, ref HitRecord p_hitRecord, ref Color p_attenuation, ref Ray p_scatteredRay)
         {
             var reflected = Utilities.ReflectRay(Vec3.GetUnitVector(p_incomingRay.Direction), p_hitRecord.Normal);
-            p_scatteredRay = new Ray(p_hitRecord.P, reflected + Roughness * Utilities.GetRandomPointInUnitSphere(), p_incomingRay.Depth + 1);
+            p_scatteredRay = new Ray(p_hitRecord.P, reflected + Roughness * Utilities.GetRandomPointInUnitSphere(), p_incomingRay.Time, p_incomingRay.Depth + 1);
             p_attenuation = Albedo;
             return Vec3.GetDotProduct(p_scatteredRay.Direction, p_hitRecord.Normal) > 0;
         }

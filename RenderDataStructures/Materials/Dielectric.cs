@@ -61,7 +61,8 @@ namespace RenderDataStructures.Materials
 
             var reflectionProbability = Utilities.RefractRay(p_incomingRay.Direction, outwardNormal, niOverNt, ref refracted) ? Utilities.SchlickApproximation(cosine, IndexOfRefraction) : 1.0d;
 
-            p_scatteredRay = rng.NextDouble() < reflectionProbability ? new Ray(p_hitRecord.P, reflected + Roughness * Utilities.GetRandomPointInUnitSphere(), p_incomingRay.Depth + 1) : new Ray(p_hitRecord.P, refracted + Roughness * Utilities.GetRandomPointInUnitSphere(), p_incomingRay.Depth + 1);
+            p_scatteredRay = rng.NextDouble() < reflectionProbability
+                ? new Ray(p_hitRecord.P, reflected + Roughness * Utilities.GetRandomPointInUnitSphere(), p_incomingRay.Time, p_incomingRay.Depth + 1) : new Ray(p_hitRecord.P, refracted + Roughness * Utilities.GetRandomPointInUnitSphere(), p_incomingRay.Time, p_incomingRay.Depth + 1);
 
             return true;
         }
