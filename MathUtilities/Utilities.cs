@@ -55,5 +55,15 @@ namespace MathUtilities
             r0 = r0 * r0;
             return r0 + (1 - r0) * Math.Pow((1 - p_cosine), 5);
         }
+
+        public static double GetMin(double p_a, double p_b)
+        {
+            return p_a < p_b ? p_a : p_b;
+        }
+
+        public static double GetMax(double p_a, double p_b)
+        {
+            return p_a > p_b ? p_a : p_b;
+        }
     }
 }

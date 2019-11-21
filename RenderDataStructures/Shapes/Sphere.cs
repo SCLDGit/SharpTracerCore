@@ -55,5 +55,11 @@ namespace RenderDataStructures.Shapes
 
             return false;
         }
+
+        public bool GenerateBoundingBox(double p_time1, double p_time2, ref BoundingBox p_bBox)
+        {
+            p_bBox = new BoundingBox(Center - new Vec3(Radius, Radius, Radius), Center + new Vec3(Radius, Radius, Radius));
+            return true;
+        }
     }
 }

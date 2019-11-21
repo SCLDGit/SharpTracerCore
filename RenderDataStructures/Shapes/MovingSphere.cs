@@ -64,13 +64,13 @@ namespace RenderDataStructures.Shapes
             return false;
         }
 
-        //public bool GenerateBoundingBox(double p_time1, double p_time2, ref BoundingBox p_box)
-        //{
-        //    var box1 = new BoundingBox(GetCenter(p_time1) - new Vec3(Radius, Radius, Radius), GetCenter(p_time1) + new Vec3(Radius, Radius, Radius));
-        //    var box2 = new BoundingBox(GetCenter(p_time2) - new Vec3(Radius, Radius, Radius), GetCenter(p_time2) + new Vec3(Radius, Radius, Radius));
-        //    p_box = BoundingBox.GetSurroundingBox(box1, box2);
-        //    return true;
+        public bool GenerateBoundingBox(double p_time1, double p_time2, ref BoundingBox p_box)
+        {
+            var box1 = new BoundingBox(GetCenter(p_time1) - new Vec3(Radius, Radius, Radius), GetCenter(p_time1) + new Vec3(Radius, Radius, Radius));
+            var box2 = new BoundingBox(GetCenter(p_time2) - new Vec3(Radius, Radius, Radius), GetCenter(p_time2) + new Vec3(Radius, Radius, Radius));
+            p_box = BoundingBox.GetSurroundingBox(box1, box2);
+            return true;
 
-        //}
+        }
     }
 }

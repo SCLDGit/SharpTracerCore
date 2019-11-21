@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using MathUtilities;
 
 namespace RenderDataStructures.Shapes
@@ -42,5 +43,31 @@ namespace RenderDataStructures.Shapes
             return hitAnything;
         }
 
+        public bool GenerateBoundingBox(double p_time1, double p_time2, ref BoundingBox p_box)
+        {
+            if (WorldHitTargets.Count < 1) return false;
+            var tempBox = new BoundingBox(new Vec3(0), new Vec3(0));
+            var firstTrue = WorldHitTargets.First().GenerateBoundingBox(p_time1, p_time2, ref tempBox);
+            if (!firstTrue)
+            {
+                return false;
+            }
+
+            p_box = tempBox;
+
+            foreach (var target in WorldHitTargets)
+            {
+                if (target.GenerateBoundingBox(p_time1, p_time2, ref tempBox))
+                {
+                    p_box = BoundingBox.GetSurroundingBox(p_box, tempBox);
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
     }
 }

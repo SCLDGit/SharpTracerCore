@@ -93,7 +93,7 @@ namespace RenderHandler
             }
         }
 
-        public Color GetColor(ref Ray p_ray, World p_world, int p_totalDepth)
+        public Color GetColor(ref Ray p_ray, IHitTarget p_world, int p_totalDepth)
         {
             var rng = RandomPool.RandomPoolLUT[Thread.CurrentThread.ManagedThreadId];
 
@@ -142,7 +142,7 @@ namespace RenderHandler
 
             var stopWatch = Stopwatch.StartNew();
 
-            var newScene = SceneGenerator.GenerateSingleMovingSphereTestScene(p_renderParameters);
+            var newScene = SceneGenerator.GenerateRandomMovingBvhScene(p_renderParameters);
 
             var renderChunks = new List<RenderChunk>();
 
@@ -227,7 +227,7 @@ namespace RenderHandler
             IsRendering = false;
         }
 
-        private void RenderSomeChunk(Image<Rgba32> p_image, ICamera p_camera, World p_world, int p_renderChunkStartRow, int p_renderChunkEndRow, RenderParameters p_renderParameters)
+        private void RenderSomeChunk(Image<Rgba32> p_image, ICamera p_camera, IHitTarget p_world, int p_renderChunkStartRow, int p_renderChunkEndRow, RenderParameters p_renderParameters)
         {
             var rng = new Random();
 
