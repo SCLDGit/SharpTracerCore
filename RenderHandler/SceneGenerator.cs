@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using MathUtilities;
 using RenderDataStructures.Cameras;
 using RenderDataStructures.Materials;
+using RenderDataStructures.Materials.Textures;
 using RenderDataStructures.Shapes;
+using StbSharp;
 using Math = System.Math;
 
 namespace RenderHandler
@@ -228,6 +231,35 @@ namespace RenderHandler
             var newScene = new SceneGenerator(newWorld, camera);
 
             return newScene;
+        }
+
+        internal static SceneGenerator GenerateEarthBvhScene(RenderParameters p_renderParameters)
+        {
+            var lookFrom = new Vec3(-13, 2, -3);
+            var lookAt = new Vec3(0, 0, 0);
+            const double focalDistance = 10.0;
+            const double aperture = 0.001;
+            var camera = new ThinLensCamera(lookFrom, lookAt, new Vec3(0, 1, 0), 20, p_renderParameters.XResolution / (float)p_renderParameters.YResolution, aperture, focalDistance, 0.0, 1.0);
+
+            var returnList = new List<IHitTarget>();
+
+            var perlinTexture = new NoiseTexture(new Color(0.8, 0.8, 0.8), 4.0, NoiseTypes.MARBLE, 0.5, 10.0, 15);
+
+            returnList.Add(new Sphere(new Vec3(0, -1000, 0), 1000, new Lambertian(perlinTexture)));
+
+            var loader = new ImageReader();
+
+            using (var stream = File.Open("ExternalData/earth.jpg", FileMode.Open))
+            {
+                var image = loader.Read(stream, StbImage.STBI_rgb);
+
+                var material = new Glossy(new ImageTexture(image.Data, image.Width, image.Height), 0.125);
+
+                returnList.Add(new Sphere(new Vec3(0, 2, 0), 2.0, material));
+
+            }
+
+            return new SceneGenerator(new BvhNode(returnList, 0.0, 1.0), camera);
         }
     }
 }

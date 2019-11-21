@@ -40,12 +40,13 @@ namespace RenderDataStructures.Shapes
             var discriminant = b * b - a * c;
             if (discriminant > 0)
             {
-                var sqrtCache = Math.Sqrt(b * b - a * c);
+                var sqrtCache = Math.Sqrt(discriminant);
                 var temp = (-b - sqrtCache) / a;
                 if (temp < p_tMax && temp > p_tMin)
                 {
                     p_hitRecord.T = temp;
                     p_hitRecord.P = p_ray.PointAt(p_hitRecord.T);
+                    GetSphereUv(p_hitRecord.P - GetCenter(p_ray.Time) / Radius, ref p_hitRecord);
                     p_hitRecord.Normal = (p_hitRecord.P - GetCenter(p_ray.Time)) / Radius;
                     p_hitRecord.Material = Material;
                     return true;
@@ -55,6 +56,7 @@ namespace RenderDataStructures.Shapes
                 {
                     p_hitRecord.T = temp;
                     p_hitRecord.P = p_ray.PointAt(p_hitRecord.T);
+                    GetSphereUv(p_hitRecord.P - GetCenter(p_ray.Time) / Radius, ref p_hitRecord);
                     p_hitRecord.Normal = (p_hitRecord.P - GetCenter(p_ray.Time)) / Radius;
                     p_hitRecord.Material = Material;
                     return true;
@@ -70,7 +72,14 @@ namespace RenderDataStructures.Shapes
             var box2 = new BoundingBox(GetCenter(p_time2) - new Vec3(Radius, Radius, Radius), GetCenter(p_time2) + new Vec3(Radius, Radius, Radius));
             p_box = BoundingBox.GetSurroundingBox(box1, box2);
             return true;
+        }
 
+        private static void GetSphereUv(Vec3 p_point, ref HitRecord p_hitRecord)
+        {
+            var phi = Math.Atan2(p_point.Z, p_point.X);
+            var theta = Math.Asin(p_point.Y);
+            p_hitRecord.U = 1 - (phi + Math.PI) / (2 * Math.PI);
+            p_hitRecord.V = (theta + Math.PI / 2) / Math.PI;
         }
     }
 }

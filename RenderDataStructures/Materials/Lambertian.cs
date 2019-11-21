@@ -20,7 +20,7 @@ namespace RenderDataStructures.Materials
         {
             var target = p_hitRecord.P + p_hitRecord.Normal + Utilities.GetRandomPointInUnitSphere();
             p_scatteredRay = new Ray(p_hitRecord.P, target - p_hitRecord.P, p_incomingRay.Time, p_incomingRay.Depth + 1);
-            p_attenuation = Albedo.GetColor(0, 0, p_hitRecord.P);
+            p_attenuation = Albedo.GetColor(p_hitRecord.U, p_hitRecord.V, p_hitRecord.P);
 
             return true;
         }

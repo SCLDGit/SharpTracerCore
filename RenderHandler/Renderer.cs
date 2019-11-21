@@ -142,7 +142,7 @@ namespace RenderHandler
 
             var stopWatch = Stopwatch.StartNew();
 
-            var newScene = SceneGenerator.GenerateTwoLargeSphereNoiseTestBvhScene(p_renderParameters);
+            var newScene = SceneGenerator.GenerateEarthBvhScene(p_renderParameters);
 
             var renderChunks = new List<RenderChunk>();
 
