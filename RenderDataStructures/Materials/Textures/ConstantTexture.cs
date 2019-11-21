@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using MathUtilities;
+﻿using MathUtilities;
 
-namespace RenderDataStructures.Materials.Textures
+namespace RenderDataStructures.Materials
 {
     public class ConstantTexture : ITexture
     {

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using MathUtilities;
 using RenderDataStructures.Cameras;
 using RenderDataStructures.Materials;
-using RenderDataStructures.Materials.Textures;
 using RenderDataStructures.Shapes;
 using Math = System.Math;
 
@@ -42,6 +41,25 @@ namespace RenderHandler
             var newScene = new SceneGenerator(newWorld, camera);
 
             return newScene;
+        }
+
+        internal static SceneGenerator GenerateTwoLargeSphereNoiseTestBvhScene(RenderParameters p_renderParameters)
+        {
+            var lookFrom = new Vec3(-13, 2, -3);
+            var lookAt = new Vec3(0, 0, 0);
+            const double focalDistance = 10.0;
+            const double aperture = 0.001;
+            var camera = new ThinLensCamera(lookFrom, lookAt, new Vec3(0, 1, 0), 20, p_renderParameters.XResolution / (float)p_renderParameters.YResolution, aperture, focalDistance, 0.0, 1.0);
+
+            var returnList = new List<IHitTarget>();
+
+            var perlinTexture = new NoiseTexture(new Color(0.8, 0.8, 0.8), 4.0, NoiseTypes.MARBLE, 0.5, 10, 15);
+
+            returnList.Add(new Sphere(new Vec3(0, -1000, 0), 1000, new Lambertian(perlinTexture)));
+
+            returnList.Add(new Sphere(new Vec3(0, 1, 0), 1.0, new Lambertian(perlinTexture)));
+
+            return new SceneGenerator(new BvhNode(returnList, 0, 1), camera);
         }
 
         internal static SceneGenerator GenerateSingleMovingSphereTestScene(RenderParameters p_renderParameters)
