@@ -4,15 +4,15 @@ using MathUtilities;
 
 namespace RenderDataStructures.Shapes
 {
-    public sealed class World : IHitTarget
+    public sealed class HitTargetCollection : IHitTarget
 
     {
-        public World()
+        public HitTargetCollection()
         {
             WorldHitTargets = new List<IHitTarget>();
         }
 
-        public World(List<IHitTarget> p_worldHitTargets)
+        public HitTargetCollection(List<IHitTarget> p_worldHitTargets)
         {
             WorldHitTargets = p_worldHitTargets;
         }

@@ -6,6 +6,7 @@ using RenderDataStructures.Cameras;
 using RenderDataStructures.Materials;
 using RenderDataStructures.Materials.Textures;
 using RenderDataStructures.Shapes;
+using RenderDataStructures.Shapes.Utility;
 using StbSharp;
 using Math = System.Math;
 
@@ -39,7 +40,7 @@ namespace RenderHandler
             worldList.Add(new Sphere(new Vec3(-1, 0, -1), 0.5, new Dielectric(new Color(1.0, 1.0, 1.0), 1.5)));
             worldList.Add(new Sphere(new Vec3(-1, 0, -1), -0.45, new Dielectric(new Color(1.0, 1.0, 1.0), 1.5)));
 
-            var newWorld = new World(worldList);
+            var newWorld = new HitTargetCollection(worldList);
 
             var newScene = new SceneGenerator(newWorld, camera);
 
@@ -79,7 +80,7 @@ namespace RenderHandler
             worldList.Add(new MovingSphere(new Vec3(-0.5, 0, -1.0), new Vec3(0.5, 0, -1.0), 0.0, 1.0, 0.35, new Lambertian(new ConstantTexture(new Color(0.8, 0.1, 0.1)))));
             worldList.Add(new Sphere(new Vec3(0, -100.5, -1), 100, new Lambertian(new ConstantTexture(new Color(0.8, 0.8, 0)))));
 
-            var newWorld = new World(worldList);
+            var newWorld = new HitTargetCollection(worldList);
 
             var newScene = new SceneGenerator(newWorld, camera);
 
@@ -128,7 +129,7 @@ namespace RenderHandler
             worldList.Add(new Sphere(new Vec3(-4, 1, 0), 1.0, new Lambertian(new ConstantTexture(new Color(0.4, 0.2, 0.1))) ));
             worldList.Add(new Sphere(new Vec3(4, 1, 0), 1.0, new Glossy(new ConstantTexture(new Color(0.7, 0.6, 0.5)), 0.05)) );
 
-            var newWorld = new World(worldList);
+            var newWorld = new HitTargetCollection(worldList);
 
             var newScene = new SceneGenerator(newWorld, camera);
 
@@ -178,7 +179,7 @@ namespace RenderHandler
             worldList.Add(new Sphere(new Vec3(-4, 1, 0), 1.0, new Lambertian(new ConstantTexture(new Color(0.4, 0.2, 0.1)))));
             worldList.Add(new Sphere(new Vec3(4, 1, 0), 1.0, new Glossy(new ConstantTexture(new Color(0.7, 0.6, 0.5)), 0.05)));
 
-            var newWorld = new World(worldList);
+            var newWorld = new HitTargetCollection(worldList);
 
             var newScene = new SceneGenerator(newWorld, camera);
 
@@ -260,6 +261,56 @@ namespace RenderHandler
             }
 
             return new SceneGenerator(new BvhNode(returnList, 0.0, 1.0), camera);
+        }
+
+        internal static SceneGenerator GenerateSimpleAreaLightBvhScene(RenderParameters p_renderParameters)
+        {
+            var lookFrom = new Vec3(10, 5, 5);
+            var lookAt = new Vec3(3, 2.25, 0);
+            const double focalDistance = 2;
+            const double aperture = 0.0;
+            var camera = new ThinLensCamera(lookFrom, lookAt, new Vec3(0, 1, 0), 45, p_renderParameters.XResolution / (float)p_renderParameters.YResolution, aperture, focalDistance, 0.0, 1.0);
+
+            var perlinTexture = new NoiseTexture(new Color(0.8, 0.8, 0.8), 4, NoiseTypes.MARBLE, 0.5, 10, 0);
+
+            var returnList = new List<IHitTarget>();
+
+            returnList.Add(new Sphere(new Vec3(0, -1000, 0), 1000, new Lambertian(perlinTexture)));
+            returnList.Add(new Sphere(new Vec3(0, 2, 0), 1.5, new Dielectric(new Color(0.95, 0.95, 0.95), 1.55, 0.01)));
+            returnList.Add(new Sphere(new Vec3(0, 7, 0), 2, new Emissive(new ConstantTexture(new Color(1, 1, 1)), 4)));
+            returnList.Add(new XYAlignedRectangle(3, 5, 1, 3, -2, new Emissive(new ConstantTexture(new Color(1, 1, 1)), 4)));
+
+            return new SceneGenerator(new BvhNode(returnList, 0.0, 1.0), camera);
+        }
+
+        internal static SceneGenerator GenerateCornellBoxBvhScene(RenderParameters p_renderParameters)
+        {
+            var lookFrom = new Vec3(278, 278, -800);
+            var lookAt = new Vec3(278, 278, 0);
+            const double focalDistance = 10.0;
+            const double aperture = 0.0001;
+            var camera = new ThinLensCamera(lookFrom, lookAt, new Vec3(0, 1, 0), 40, p_renderParameters.XResolution / (float)p_renderParameters.YResolution, aperture, focalDistance, 0.0, 1.0);
+
+            var redMaterial = new Lambertian(new ConstantTexture(new Color(0.65, 0.05, 0.05)));
+            var greenMaterial = new Lambertian(new ConstantTexture(new Color(0.12, 0.45, 0.15)));
+            var whiteMaterial = new Lambertian(new ConstantTexture(new Color(0.73, 0.73, 0.73)));
+            var emissiveMaterial = new Emissive(new ConstantTexture(new Color(1, 1, 1)), 15);
+
+            var worldList = new List<IHitTarget>
+            {
+                new FlipNormals(new YZAlignedRectangle(0, 555, 0, 555, 555, greenMaterial)),
+                new YZAlignedRectangle(0, 555, 0, 555, 0, redMaterial),
+                new XZAlignedRectangle(213, 343, 227, 332, 554.5, emissiveMaterial),
+                new FlipNormals(new XZAlignedRectangle(0, 555, 0, 555, 555, whiteMaterial)),
+                new XZAlignedRectangle(0, 555, 0, 555, 0, whiteMaterial),
+                new FlipNormals(new XYAlignedRectangle(0, 555, 0, 555, 555, whiteMaterial)),
+                //new Translate(new Box(new Vec3(0), new Vec3(165, 165, 165), whiteMaterial), new Vec3(130, 0, 65)),
+                //new Translate(new Box(new Vec3(0), new Vec3(165, 330, 165), whiteMaterial), new Vec3(265, 0, 295)),
+                //new Translate(new RotateY(new Box(new Vec3(0), new Vec3(165, 165, 165), whiteMaterial), -18 ), new Vec3(130, 0, 65)),
+                //new Translate(new RotateY(new Box(new Vec3(0), new Vec3(165, 330, 165), whiteMaterial), 15 ), new Vec3(265, 0, 295)),
+            };
+
+            return new SceneGenerator(new BvhNode(worldList, 0, 1), camera);
         }
     }
 }

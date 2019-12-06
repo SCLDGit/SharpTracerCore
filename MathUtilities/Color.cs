@@ -41,6 +41,18 @@ namespace MathUtilities
             }
         }
 
+        public void Clamp()
+        {
+            if (X < 0) X = 0;
+            if (X > 1) X = 1;
+
+            if (Y < 0) Y = 0;
+            if (Y > 1) Y = 1;
+
+            if (Z < 0) Z = 0;
+            if (Z > 1) Z = 1;
+        }
+
         public static Color operator +(Color p_v1, Color p_v2)
         {
             return new Color(p_v1.X + p_v2.X, p_v1.Y + p_v2.Y, p_v1.Z + p_v2.Z);

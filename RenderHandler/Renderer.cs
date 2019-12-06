@@ -95,26 +95,20 @@ namespace RenderHandler
 
         public Color GetColor(ref Ray p_ray, IHitTarget p_world, int p_totalDepth)
         {
-            var rng = RandomPool.RandomPoolLUT[Thread.CurrentThread.ManagedThreadId];
-
             var hitRecord = new HitRecord();
 
-            if (p_world.WasHit(p_ray, 0.001d, double.MaxValue, ref hitRecord))
+            if (!p_world.WasHit(p_ray, 0.001d, double.MaxValue, ref hitRecord)) return new Color(0, 0, 0);
+            var scatteredRay = new Ray(new Vec3(0, 0, 0), new Vec3(0, 0, 0));
+            var attenuation = new Color(0, 0, 0);
+            var emitted = hitRecord.Material.GetEmitted(hitRecord.U, hitRecord.V, hitRecord.P);
+
+            if (p_ray.Depth < p_totalDepth && hitRecord.Material.ScatterRay(ref p_ray, ref hitRecord, ref attenuation, ref scatteredRay))
             {
-                var scatteredRay = new Ray(new Vec3(0, 0, 0), new Vec3(0, 0, 0));
-                var attenuation = new Color(0, 0, 0);
-
-                if (p_ray.Depth < p_totalDepth && hitRecord.Material.ScatterRay(ref p_ray, ref hitRecord, ref attenuation, ref scatteredRay))
-                {
-                    return attenuation * GetColor(ref scatteredRay, p_world, p_totalDepth);
-                }
-
-                return new Color(0, 0, 0);
+                return emitted + attenuation * GetColor(ref scatteredRay, p_world, p_totalDepth);
             }
 
-            var unitDirection = Vec3.GetUnitVector(p_ray.Direction);
-            var t = 0.5 * (unitDirection.Y + 1);
-            return (1.0 - t) * new Color(1.0, 1.0, 1.0) + t * new Color(0.5, 0.7, 1.0);
+            return emitted;
+
         }
 
         public void DoRender(RenderParameters p_renderParameters, out TimeSpan p_renderTime)
@@ -142,7 +136,7 @@ namespace RenderHandler
 
             var stopWatch = Stopwatch.StartNew();
 
-            var newScene = SceneGenerator.GenerateEarthBvhScene(p_renderParameters);
+            var newScene = SceneGenerator.GenerateCornellBoxBvhScene(p_renderParameters);
 
             var renderChunks = new List<RenderChunk>();
 
@@ -253,6 +247,8 @@ namespace RenderHandler
                     color /= p_renderParameters.NumberOfSamples;
 
                     color.GammaCorrect(p_renderParameters.GammaCorrection);
+
+                    color.Clamp();
 
                     // Flip image writing here for Y axis. - Comment by Matt Heimlich on 11/8/2019 @ 19:24:07
                     if (p_renderParameters.RealTimeUpdate)

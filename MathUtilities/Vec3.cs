@@ -2,9 +2,9 @@
 {
     public class Vec3
     {
-        public double X { get; protected set; }
-        public double Y { get; protected set; }
-        public double Z { get; protected set; }
+        public double X { get; set; }
+        public double Y { get; set; }
+        public double Z { get; set; }
         public double R => X;
         public double G => Y;
         public double B => Z;
