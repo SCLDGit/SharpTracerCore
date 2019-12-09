@@ -350,5 +350,91 @@ namespace RenderHandler
 
             return new SceneGenerator(new BvhNode(worldList, 0, 1), camera);
         }
+
+        internal static SceneGenerator GenerateFinalTheNextWeekScene(RenderParameters p_renderParameters)
+        {
+            var          lookFrom      = new Vec3(278, 278, -800);
+            var          lookAt        = new Vec3(278, 278, 0);
+            const double focalDistance = 10.0;
+            const double aperture      = 0.0001;
+            var          camera        = new ThinLensCamera(lookFrom, lookAt, new Vec3(0, 1, 0), 40, p_renderParameters.XResolution / (float)p_renderParameters.YResolution, aperture, focalDistance, 0.0, 1.0);
+
+            var rng = new Random();
+
+            var numberOfBoxes = 20;
+
+            var whiteMaterial    = new Lambertian(new ConstantTexture(new Color(0.73, 0.73, 0.73)));
+            var groundMaterial    = new Lambertian(new ConstantTexture(new Color(0.48, 0.83, 0.53)));
+            var emissiveMaterial = new Emissive(new ConstantTexture(new Color(1, 1, 1)), 7);
+
+            var worldList = new List<IHitTarget>();
+
+            for ( var i = 0; i < numberOfBoxes; ++i )
+            {
+                for (var j = 0; j < numberOfBoxes; ++j)
+                {
+                    var w = 100;
+
+                    var x0 = -1000 + i * w;
+                    var z0 = -1000 + j * w;
+                    var y0 = 0;
+
+                    var x1 = x0 + w;
+                    var y1 = 100 * (rng.NextDouble() + 0.01d);
+                    var z1 = z0 + w;
+
+                    worldList.Add(new Box(new Vec3(x0, y0, z0), new Vec3(x1, y1, z1), groundMaterial));
+                }
+            }
+
+            var l = 0;
+
+            worldList.Add(new XZAlignedRectangle(123, 423, 147, 412, 554.5, emissiveMaterial));
+
+            var center = new Vec3(400, 400, 200);
+
+            worldList.Add(new MovingSphere(center, center + new Vec3(30, 0, 0), 0, 1, 50, new Lambertian(new ConstantTexture(new Color(0.7, 0.3, 0.1)))));
+
+            worldList.Add(new Sphere(new Vec3(260, 150, 45), 50, new Dielectric(new Color(0.9, 0.9, 0.9), 1.55, 0.01d )));
+            worldList.Add(new Sphere(new Vec3(0, 150, 145), 50, new Glossy(new ConstantTexture(new Color(0.8, 0.8, 0.9)), 10) ));
+
+            var boundary = new Sphere(new Vec3(360, 150, 145), 70, new Dielectric(new Color(0.9, 0.9, 0.9), 1.55, 0.01d ) );
+
+            worldList.Add(boundary);
+
+            worldList.Add(new ConstantMedium(boundary, 0.2, new IsotropicVolume(new ConstantTexture(new Color(0.2, 0.4, 0.9)))));
+
+            boundary = new Sphere(new Vec3(0), 5000, new Dielectric(new Color(0.9, 0.9,0.9), 1.55 ) );
+
+            worldList.Add(new ConstantMedium(boundary, 0.0001, new IsotropicVolume(new ConstantTexture(new Color(0.9, 0.9, 0.9)))));
+
+            var loader = new ImageReader();
+
+            using var stream = File.Open("ExternalData/earth.jpg", FileMode.Open);
+            var image = loader.Read(stream, StbImage.STBI_rgb);
+
+            var material = new Lambertian(new ImageTexture(image.Data, image.Width, image.Height));
+
+            worldList.Add(new Sphere(new Vec3(400, 200, 400), 100, material));
+
+            var perlinTexture = new NoiseTexture(new Color(0.8, 0.8, 0.8), 4, NoiseTypes.MARBLE, 0.5, 10, 0);
+
+            worldList.Add(new Sphere(new Vec3(220, 280, 300), 80, new Lambertian(perlinTexture) ));
+
+            var numberOfSpheres = 1000;
+
+            var sphereList = new List<IHitTarget>();
+
+            for ( var j = 0; j < numberOfSpheres; ++j )
+            {
+                sphereList.Add(new Sphere(new Vec3(165 * rng.NextDouble(), 165 * rng.NextDouble(), 165 * rng.NextDouble()), 10, whiteMaterial ));
+            }
+
+            worldList.Add(new Translate(new RotateY(new BvhNode(sphereList, 0, 1), 15 ), new Vec3(-100, 270, 395)));
+
+            var finalList = new BvhNode(worldList, 0, 1);
+
+            return new SceneGenerator(finalList, camera);
+        }
     }
 }

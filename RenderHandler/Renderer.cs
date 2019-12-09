@@ -136,7 +136,7 @@ namespace RenderHandler
 
             var stopWatch = Stopwatch.StartNew();
 
-            var newScene = SceneGenerator.GenerateSimpleAreaLightBvhScene(p_renderParameters);
+            var newScene = SceneGenerator.GenerateFinalTheNextWeekScene(p_renderParameters);
 
             var renderChunks = new List<RenderChunk>();
 
