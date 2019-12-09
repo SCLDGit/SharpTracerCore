@@ -17,7 +17,6 @@ namespace RenderDataStructures.Shapes
         {
             if (!OriginalTarget.WasHit(p_ray, p_tMin, p_tMax, ref p_hitRecord)) return false;
             p_hitRecord.Normal = -p_hitRecord.Normal;
-            p_hitRecord.P += p_hitRecord.Normal * 0.001d;
             return true;
 
         }

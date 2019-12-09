@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using MathUtilities;
 
-namespace RenderDataStructures.Shapes.Utility
+namespace RenderDataStructures.Shapes
 {
     public class RotateY : IHitTarget
     {
@@ -16,9 +16,9 @@ namespace RenderDataStructures.Shapes.Utility
             SinTheta = Math.Sin(radians);
             CosTheta = Math.Cos(radians);
 
-            m_boundingBox = new BoundingBox(new Vec3(0), new Vec3(0));
+            var boundingBox = new BoundingBox(new Vec3(0), new Vec3(0) );
 
-            HasBoundingBox = OriginalTarget.GenerateBoundingBox(0, 1, ref m_boundingBox);
+            HasBoundingBox = OriginalTarget.GenerateBoundingBox(0, 1, ref boundingBox);
 
             var min = new Vec3(double.MaxValue, double.MaxValue, double.MaxValue);
             var max = new Vec3(double.MinValue, double.MinValue, double.MinValue);
@@ -29,9 +29,9 @@ namespace RenderDataStructures.Shapes.Utility
                 {
                     for (var k = 0; k < 2; ++k)
                     {
-                        var x = i * m_boundingBox.Max.X + (1 - i) * m_boundingBox.Min.X;
-                        var y = j * m_boundingBox.Max.Y + (1 - j) * m_boundingBox.Min.Y;
-                        var z = k * m_boundingBox.Max.Z + (1 - k) * m_boundingBox.Min.Z;
+                        var x = i * boundingBox.Max.X + (1 - i) * boundingBox.Min.X;
+                        var y = j * boundingBox.Max.Y + (1 - j) * boundingBox.Min.Y;
+                        var z = k * boundingBox.Max.Z + (1 - k) * boundingBox.Min.Z;
 
                         var newX = CosTheta * x + SinTheta * z;
                         var newZ = -SinTheta * x + CosTheta * z;
@@ -50,19 +50,19 @@ namespace RenderDataStructures.Shapes.Utility
                 }
             }
 
-            m_boundingBox = new BoundingBox(min, max);
+            BoundingBox = new BoundingBox(min, max);
         }
 
         public IHitTarget OriginalTarget { get; set; }
         public double SinTheta { get; set; }
         public double CosTheta { get; set; }
         public bool HasBoundingBox { get; set; }
-        public BoundingBox m_boundingBox;
+        public BoundingBox BoundingBox { get; set; }
 
         public bool WasHit(Ray p_ray, double p_tMin, double p_tMax, ref HitRecord p_hitRecord)
         {
-            var origin = p_ray.Origin;
-            var direction = p_ray.Direction;
+            var origin = new Vec3(p_ray.Origin);
+            var direction = new Vec3(p_ray.Direction);
 
             origin.X = CosTheta * p_ray.Origin.X - SinTheta * p_ray.Origin.Z;
             origin.Z = SinTheta * p_ray.Origin.X + CosTheta * p_ray.Origin.Z;
@@ -73,8 +73,8 @@ namespace RenderDataStructures.Shapes.Utility
             var rotatedRay = new Ray(origin, direction, p_ray.Time, p_ray.Depth);
 
             if (!OriginalTarget.WasHit(rotatedRay, p_tMin, p_tMax, ref p_hitRecord)) return false;
-            var p = p_hitRecord.P;
-            var normal = p_hitRecord.Normal;
+            var p = new Vec3(p_hitRecord.P);
+            var normal = new Vec3(p_hitRecord.Normal);
             p.X = CosTheta * p_hitRecord.P.X + SinTheta * p_hitRecord.P.Z;
             p.Z = -SinTheta * p_hitRecord.P.X + CosTheta * p_hitRecord.P.Z;
 
@@ -89,7 +89,7 @@ namespace RenderDataStructures.Shapes.Utility
 
         public bool GenerateBoundingBox(double p_t1, double p_t2, ref BoundingBox p_bBox)
         {
-            p_bBox = m_boundingBox;
+            p_bBox = BoundingBox;
             return HasBoundingBox;
         }
     }

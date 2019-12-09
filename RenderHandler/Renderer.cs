@@ -131,12 +131,12 @@ namespace RenderHandler
                 Image = new Bitmap(p_renderParameters.XResolution, p_renderParameters.YResolution),
                 IsLocked = false
             };
-            
+
             using var image = new Image<Rgba32>(p_renderParameters.XResolution, p_renderParameters.YResolution);
 
             var stopWatch = Stopwatch.StartNew();
 
-            var newScene = SceneGenerator.GenerateCornellBoxBvhScene(p_renderParameters);
+            var newScene = SceneGenerator.GenerateSimpleAreaLightBvhScene(p_renderParameters);
 
             var renderChunks = new List<RenderChunk>();
 

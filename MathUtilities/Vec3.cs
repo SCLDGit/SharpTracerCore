@@ -9,6 +9,13 @@
         public double G => Y;
         public double B => Z;
 
+        public Vec3(Vec3 p_vector)
+        {
+            X = p_vector.X;
+            Y = p_vector.Y;
+            Z = p_vector.Z;
+        }
+
         public Vec3(double p_double)
         {
             X = p_double;
@@ -25,6 +32,11 @@
 
         protected Vec3()
         {
+        }
+
+        public override string ToString()
+        {
+            return $"X: {X:N3}, Y: {Y:N3}, Z: {Z:N3}";
         }
 
         public double GetLength()

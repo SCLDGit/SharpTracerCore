@@ -14,6 +14,5 @@ namespace RenderDataStructures.Materials
         {
             return new Color(0, 0, 0);
         }
-
     }
 }

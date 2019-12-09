@@ -6,7 +6,6 @@ using RenderDataStructures.Cameras;
 using RenderDataStructures.Materials;
 using RenderDataStructures.Materials.Textures;
 using RenderDataStructures.Shapes;
-using RenderDataStructures.Shapes.Utility;
 using StbSharp;
 using Math = System.Math;
 
@@ -298,17 +297,56 @@ namespace RenderHandler
 
             var worldList = new List<IHitTarget>
             {
+                // Cornell Box
                 new FlipNormals(new YZAlignedRectangle(0, 555, 0, 555, 555, greenMaterial)),
                 new YZAlignedRectangle(0, 555, 0, 555, 0, redMaterial),
                 new XZAlignedRectangle(213, 343, 227, 332, 554.5, emissiveMaterial),
                 new FlipNormals(new XZAlignedRectangle(0, 555, 0, 555, 555, whiteMaterial)),
                 new XZAlignedRectangle(0, 555, 0, 555, 0, whiteMaterial),
                 new FlipNormals(new XYAlignedRectangle(0, 555, 0, 555, 555, whiteMaterial)),
-                //new Translate(new Box(new Vec3(0), new Vec3(165, 165, 165), whiteMaterial), new Vec3(130, 0, 65)),
-                //new Translate(new Box(new Vec3(0), new Vec3(165, 330, 165), whiteMaterial), new Vec3(265, 0, 295)),
-                //new Translate(new RotateY(new Box(new Vec3(0), new Vec3(165, 165, 165), whiteMaterial), -18 ), new Vec3(130, 0, 65)),
-                //new Translate(new RotateY(new Box(new Vec3(0), new Vec3(165, 330, 165), whiteMaterial), 15 ), new Vec3(265, 0, 295)),
+
+                //Cornell Objects
+                new Translate(new RotateY(new Box(new Vec3(0), new Vec3(165, 165, 165), whiteMaterial), -18), new Vec3(130, 0, 65)),
+                new Translate(new RotateY(new Box(new Vec3(0), new Vec3(165, 330, 165), whiteMaterial), 15 ), new Vec3(265, 0, 295)),
             };
+
+            return new SceneGenerator(new BvhNode(worldList, 0, 1), camera);
+        }
+
+        internal static SceneGenerator GenerateCornellBoxVolumeBvhScene(RenderParameters p_renderParameters)
+        {
+            var          lookFrom      = new Vec3(278, 278, -800);
+            var          lookAt        = new Vec3(278, 278, 0);
+            const double focalDistance = 10.0;
+            const double aperture      = 0.0001;
+            var          camera        = new ThinLensCamera(lookFrom, lookAt, new Vec3(0, 1, 0), 40, p_renderParameters.XResolution / (float)p_renderParameters.YResolution, aperture, focalDistance, 0.0, 1.0);
+
+            var redMaterial      = new Lambertian(new ConstantTexture(new Color(0.65, 0.05, 0.05)));
+            var greenMaterial    = new Lambertian(new ConstantTexture(new Color(0.12, 0.45, 0.15)));
+            var whiteMaterial    = new Lambertian(new ConstantTexture(new Color(0.73, 0.73, 0.73)));
+            var emissiveMaterial = new Emissive(new ConstantTexture(new Color(1, 1, 1)), 7);
+
+            var volumeBox1 =
+                new Translate(new RotateY(new Box(new Vec3(0), new Vec3(165, 165, 165), whiteMaterial), -18),
+                              new Vec3(130, 0, 65));
+            var volumeBox2 =
+                new Translate(new RotateY(new Box(new Vec3(0), new Vec3(165, 330, 165), whiteMaterial), 15),
+                              new Vec3(265, 0, 295));
+
+            var worldList = new List<IHitTarget>
+                            {
+                                // Cornell Box
+                                new FlipNormals(new YZAlignedRectangle(0, 555, 0, 555, 555, greenMaterial)),
+                                new YZAlignedRectangle(0, 555, 0, 555, 0, redMaterial),
+                                new XZAlignedRectangle(113, 443, 127, 432, 554.5, emissiveMaterial),
+                                new FlipNormals(new XZAlignedRectangle(0, 555, 0, 555, 555, whiteMaterial)),
+                                new XZAlignedRectangle(0, 555, 0, 555, 0, whiteMaterial),
+                                new FlipNormals(new XYAlignedRectangle(0, 555, 0, 555, 555, whiteMaterial)),
+
+                                //Cornell Objects
+                                new ConstantMedium(volumeBox1, 0.01, new IsotropicVolume(new ConstantTexture(new Color(1, 1, 1)))),
+                                new ConstantMedium(volumeBox2, 0.01, new IsotropicVolume(new ConstantTexture(new Color(0, 0, 0)))),
+                            };
 
             return new SceneGenerator(new BvhNode(worldList, 0, 1), camera);
         }

@@ -160,7 +160,7 @@ namespace RenderDataStructures.Shapes
 
         public bool GenerateBoundingBox(double p_time1, double p_time2, ref BoundingBox p_box)
         {
-            p_box = new BoundingBox(new Vec3(Y1, K - 0.0001, Z1), new Vec3(Y2, K + 0.0001, Z2));
+            p_box = new BoundingBox(new Vec3(K - 0.0001, Y1, Z1), new Vec3(K + 0.0001, Y2, Z2));
             return true;
         }
     }
